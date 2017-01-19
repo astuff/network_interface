@@ -15,60 +15,90 @@
 * TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
 */
 
-// Define a class that supports a basic CAN interface that's independent of the hardware and driver library used
-// Different libraries can be created to define all these functions for a specific driver library
+#include <network_interface.h>
 
-#ifndef UDP_INTERFACE_HPP
-#define UDP_INTERFACE_HPP
+#include <cstring>
 
-//C++ Includes
-#include <iostream>
+using namespace AS::Network;
+using AS::Network::return_statuses;
+using namespace std;
+using namespace boost;
+using boost::asio::ip::tcp;
 
-//OS Includes
-#include <unistd.h>
-#include <netinet/in.h>
-
-namespace AS
+//Default constructor.
+TCPInterface::TCPInterface() :
+  ok_(false), socket_(io_service_)
 {
-namespace UDP
-{
-enum return_statuses
-{
-  ok = 0,
-  init_failed,
-  no_messages_received,
-  send_failed
-};
-
-class UDPInterface
-{
-public:
-  UDPInterface();
-
-  ~UDPInterface();
-
-  // Called to pass in parameters and open ethernet link
-  return_statuses open(const char *local_address,
-                       const char *remote_address,
-                       int local_port,
-                       int remote_port);
-
-  // Close the ethernet link
-  return_statuses close();
-
-  // Read a message
-  return_statuses read(unsigned char *msg, unsigned int *size, unsigned int buf_size);
-
-  // Send a message
-  return_statuses send(unsigned char *msg, unsigned int size);
-
-private:
-  int socket_;
-  in_addr_t remote_addr_;
-  int remote_port_;
-  bool ok_;
-};
-
 }
+
+//Default destructor.
+TCPInterface::~TCPInterface()
+{
 }
-#endif
+
+return_statuses TCPInterface::open(const char *ip_address, const long *port)
+{
+  stringstream sPort;
+  sPort << port;
+          
+  tcp::resolver res(io_service_);
+  tcp::resolver::query query(tcp::v4(), ip_address, sPort.str());
+  tcp::resolver::iterator it = res.resolve(query);
+
+  try 
+  {
+    socket_.connect(*it);
+  }
+  catch (std::exception& e) {
+    close();
+    return init_failed;
+  }
+  
+  ok_ = true;
+  return ok;
+}
+
+return_statuses TCPInterface::close()
+{
+  if (!ok_)
+    return init_failed;
+
+  socket_.close();
+  return ok;
+}
+
+return_statuses TCPInterface::read(unsigned char *msg, unsigned int *size, size_t buf_size)
+{
+  if (!ok_)
+    return init_failed;
+
+  return_statuses return_val = no_messages_received;
+  bool done = false;
+  while (!done)
+  {
+    int rcvSize = socket_.read_some(asio::buffer(msg, buf_size));
+    if(rcvSize <= 0)
+    {
+      *size = 0;
+      done = true;
+    }
+    else
+    {
+      *size = rcvSize;
+      done = true;
+      return_val = ok;
+    }
+  }
+
+  return return_val;
+}
+
+return_statuses TCPInterface::send(unsigned char *msg, size_t size)
+{
+  if (!ok_)
+    return init_failed;
+
+  socket_.send(asio::buffer(msg, size));
+
+  return ok;
+}

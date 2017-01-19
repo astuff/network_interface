@@ -15,7 +15,7 @@
 * TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
 */
 
-#include <udp_interface.h>
+#include <network_interface.h>
 
 #include <cstring>
 
@@ -24,7 +24,7 @@
 #include <fcntl.h>
 
 using namespace std;
-using namespace AS::UDP;
+using namespace AS::Network;
 
 //Default constructor.
 UDPInterface::UDPInterface() :

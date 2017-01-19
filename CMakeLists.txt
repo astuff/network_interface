@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(udp_interface)
+project(network_interface)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -35,12 +35,13 @@ include_directories(include/${PROJECT_NAME}
 )
 
 ## Declare a C++ library
-add_library(ros_udp_interface
+add_library(network_interface
   src/udp_interface.cpp
+  src/tcp_interface.cpp
 )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ros_udp_interface
+target_link_libraries(network_interface
     ${catkin_LIBRARIES}
 )
 
@@ -49,7 +50,7 @@ target_link_libraries(ros_udp_interface
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ros_udp_interface
+install(TARGETS network_interface
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
