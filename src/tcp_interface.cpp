@@ -20,7 +20,6 @@
 #include <cstring>
 
 using namespace AS::Network;
-using AS::Network::return_statuses;
 using namespace std;
 using namespace boost;
 using boost::asio::ip::tcp;
@@ -36,11 +35,10 @@ TCPInterface::~TCPInterface()
 {
 }
 
-return_statuses TCPInterface::open(const char *ip_address, const long *port)
+return_statuses TCPInterface::open(const char *ip_address, int port)
 {
   stringstream sPort;
   sPort << port;
-          
   tcp::resolver res(io_service_);
   tcp::resolver::query query(tcp::v4(), ip_address, sPort.str());
   tcp::resolver::iterator it = res.resolve(query);
@@ -67,7 +65,7 @@ return_statuses TCPInterface::close()
   return ok;
 }
 
-return_statuses TCPInterface::read(unsigned char *msg, unsigned int *size, size_t buf_size)
+return_statuses TCPInterface::read(unsigned char *msg, size_t buf_size)
 {
   if (!ok_)
     return init_failed;
@@ -79,12 +77,10 @@ return_statuses TCPInterface::read(unsigned char *msg, unsigned int *size, size_
     int rcvSize = socket_.read_some(asio::buffer(msg, buf_size));
     if(rcvSize <= 0)
     {
-      *size = 0;
       done = true;
     }
     else
     {
-      *size = rcvSize;
       done = true;
       return_val = ok;
     }

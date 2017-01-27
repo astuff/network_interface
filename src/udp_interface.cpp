@@ -25,6 +25,7 @@
 
 using namespace std;
 using namespace AS::Network;
+using AS::Network::return_statuses;
 
 //Default constructor.
 UDPInterface::UDPInterface() :

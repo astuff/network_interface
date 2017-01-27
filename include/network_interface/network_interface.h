@@ -78,11 +78,11 @@ namespace Network
       ~TCPInterface();
           
       // Called to pass in parameters and open ethernet link
-      return_statuses open(const char *ip_address, const long *port);
+      return_statuses open(const char *ip_address, int port);
       // Close the ethernet link
       return_statuses close();
       // Read a message
-      return_statuses read(unsigned char *msg, unsigned int *size, size_t buf_size);
+      return_statuses read(unsigned char *msg, size_t buf_size);
       // Send a message
       return_statuses send(unsigned char *msg, size_t size);
     private:

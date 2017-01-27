@@ -3,14 +3,16 @@ project(network_interface)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    std_msgs
-    message_generation)
+  roscpp
+  std_msgs
+  message_generation
+)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
   udp_frame.msg
+  TCPFrame.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -21,6 +23,7 @@ generate_messages(
 
 catkin_package(
     INCLUDE_DIRS include/${PROJECT_NAME}
+    LIBRARIES network_interface
     CATKIN_DEPENDS std_msgs message_runtime
 )
 
