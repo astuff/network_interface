@@ -82,12 +82,13 @@ namespace Network
       // Close the ethernet link
       return_statuses close();
       // Read a message
-      return_statuses read(unsigned char *msg, size_t buf_size);
+      return_statuses read_some(unsigned char *msg, size_t buf_size);
+      return_statuses read_exactly(unsigned char *msg, size_t buf_size, unsigned int bytes);
       // Send a message
       return_statuses send(unsigned char *msg, size_t size);
     private:
-      boost::asio::ip::tcp::socket socket_;
       boost::asio::io_service io_service_;
+      boost::asio::ip::tcp::socket socket_;
       bool ok_;
   };
 }  

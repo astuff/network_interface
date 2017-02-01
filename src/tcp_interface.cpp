@@ -16,6 +16,7 @@
 */
 
 #include <network_interface.h>
+#include <sys/socket.h>
 
 #include <cstring>
 
@@ -26,7 +27,7 @@ using boost::asio::ip::tcp;
 
 //Default constructor.
 TCPInterface::TCPInterface() :
-  ok_(false), socket_(io_service_)
+  ok_(false) , socket_(io_service_)
 {
 }
 
@@ -65,28 +66,34 @@ return_statuses TCPInterface::close()
   return ok;
 }
 
-return_statuses TCPInterface::read(unsigned char *msg, size_t buf_size)
+return_statuses TCPInterface::read_exactly(unsigned char *msg, size_t buf_size, unsigned int bytes)
 {
   if (!ok_)
     return init_failed;
 
-  return_statuses return_val = no_messages_received;
-  bool done = false;
-  while (!done)
+  boost::system::error_code ec;
+  int rcv_size = asio::read(socket_, asio::buffer(msg, buf_size), asio::transfer_exactly(bytes), ec);
+  if(ec)
   {
-    int rcvSize = socket_.read_some(asio::buffer(msg, buf_size));
-    if(rcvSize <= 0)
-    {
-      done = true;
-    }
-    else
-    {
-      done = true;
-      return_val = ok;
-    }
+    printf("error occurred in read_exactly");
+    return init_failed;
   }
+  return ok;
+}
 
-  return return_val;
+return_statuses TCPInterface::read_some(unsigned char *msg, size_t buf_size)
+{
+  if (!ok_)
+    return init_failed;
+
+  boost::system::error_code ec;
+    int rcv_size = socket_.read_some(asio::buffer(msg, buf_size), ec);
+    if(ec)
+    {
+      printf("error occurred in read_some");
+      return init_failed;
+    }
+    return ok;
 }
 
 return_statuses TCPInterface::send(unsigned char *msg, size_t size)
