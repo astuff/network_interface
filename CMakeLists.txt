@@ -22,7 +22,7 @@ generate_messages(
 )
 
 catkin_package(
-    INCLUDE_DIRS include/${PROJECT_NAME}
+    INCLUDE_DIRS include
     LIBRARIES network_interface
     CATKIN_DEPENDS std_msgs message_runtime
 )
@@ -38,13 +38,13 @@ include_directories(include/${PROJECT_NAME}
 )
 
 ## Declare a C++ library
-add_library(network_interface
+add_library(${PROJECT_NAME}
   src/udp_interface.cpp
   src/tcp_interface.cpp
 )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(network_interface
+target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
 )
 
@@ -53,13 +53,13 @@ target_link_libraries(network_interface
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS network_interface
+install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
+install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
