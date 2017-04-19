@@ -1,16 +1,25 @@
 <?xml version="1.0"?>
 <package>
   <name>network_interface</name>
-  <version>1.0.0</version>
+  <version>1.6.0</version>
   <description>Network interfaces and messages.</description>
+  <license>GNU GPLv3</license>
+
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
-  <license>BSD</license>
+
+  <url type="bugtracker">https://bitbucket.org/autonomoustuff/network_interface/issues</url>
   <url type="repository">https://bitbucket.org/autonomoustuff/network_interface</url>
+
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
-  <buildtool_depend>catkin</buildtool_depend>
+  <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
+  <author email="jkale@autonomoustuff.com">Joe Kale</author>
+
   <build_depend>roscpp</build_depend>
-  <build_depend>message_generation</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>message_runtime</run_depend>
