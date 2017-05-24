@@ -82,19 +82,19 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg, size_t buf_size, 
   return ok;
 }
 
-return_statuses TCPInterface::read_some(unsigned char *msg, size_t buf_size)
+return_statuses TCPInterface::read_some(unsigned char *msg, size_t buf_size, size_t &bytes_read)
 {
   if (!ok_)
     return init_failed;
 
   boost::system::error_code ec;
-    int rcv_size = socket_.read_some(asio::buffer(msg, buf_size), ec);
-    if(ec)
-    {
-      printf("error occurred in read_some");
-      return init_failed;
-    }
-    return ok;
+  bytes_read = socket_.read_some(asio::buffer(msg, buf_size), ec);
+  if(ec)
+  {
+    printf("error occurred in read_some");
+    return init_failed;
+  }
+  return ok;
 }
 
 return_statuses TCPInterface::send(unsigned char *msg, size_t size)

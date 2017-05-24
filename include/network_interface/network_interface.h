@@ -83,7 +83,7 @@ namespace Network
       // Close the ethernet link
       return_statuses close();
       // Read a message
-      return_statuses read_some(unsigned char *msg, size_t buf_size);
+      return_statuses read_some(unsigned char *msg, size_t buf_size, size_t &bytes_read);
       return_statuses read_exactly(unsigned char *msg, size_t buf_size, unsigned int bytes);
       // Send a message
       return_statuses send(unsigned char *msg, size_t size);
