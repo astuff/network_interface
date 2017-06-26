@@ -18,19 +18,13 @@
 
 #include <network_interface.h>
 
-#include <cstring>
-
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-
 using namespace std;
 using namespace AS::Network;
-using AS::Network::return_statuses;
+using boost::asio::ip::udp;
 
 //Default constructor.
 UDPInterface::UDPInterface() :
-        ok_(false)
+  socket_(io_service_)
 {
 }
 
@@ -39,131 +33,85 @@ UDPInterface::~UDPInterface()
 {
 }
 
-return_statuses UDPInterface::open(const char *local_address,
-                                   const char *remote_address,
-                                   int local_port,
-                                   int remote_port)
+return_statuses UDPInterface::open(const char *ip_address, const int &port)
 {
-    // Initialize socket
-    socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (socket_ < 0)
-        return init_failed;
+  if (socket_.is_open())
+    return OK;
 
-    // Allow re-use
-    int reuse = 1;
-    int err = setsockopt(socket_,
-                         SOL_SOCKET,
-                         SO_REUSEADDR,
-                         (char *) &reuse,
-                         sizeof(reuse));
-    if (err < 0)
-        return init_failed;
+  stringstream sPort;
+  sPort << port;
+  udp::resolver res(io_service_);
+  udp::resolver::query query(udp::v4(), ip_address, sPort.str());
+  sender_endpoint_ = *res.resolve(query);
+  boost::system::error_code ec;
 
-    // Prevent blocking
-    int nonBlocking = 1;
-    err = fcntl(socket_, F_SETFL, O_NONBLOCK, nonBlocking);
+  socket_.connect(sender_endpoint_, ec);
 
-    if (err < 0)
-        return init_failed;
-
-    in_addr_t local_addr = inet_addr(local_address);
-    struct sockaddr_in sockaddr;
-    memset(&sockaddr, 0, sizeof(sockaddr));
-    sockaddr.sin_family = AF_INET;
-    sockaddr.sin_port = htons((unsigned short) local_port);
-    sockaddr.sin_addr.s_addr = local_addr;
-
-    err = bind(socket_, (struct sockaddr*) &sockaddr, sizeof(sockaddr));
-
-    if (err < 0)
-        return init_failed;
-
-    remote_addr_ = inet_addr(remote_address);
-    remote_port_ = remote_port;
-
-    ok_ = true;
-
-    return ok;
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    close();
+    return INIT_FAILED;
+  }
 }
 
 return_statuses UDPInterface::close()
 {
-    if (!ok_)
-        return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
-    shutdown(socket_, SHUT_RDWR);
+  boost::system::error_code ec;
+  socket_.close(ec);
 
-    return ok;
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    return CLOSE_FAILED;
+  }
 }
 
-return_statuses UDPInterface::read(unsigned char *msg, unsigned int *size, unsigned int buf_size)
+return_statuses UDPInterface::read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
 {
-    if (!ok_)
-        return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
-    struct sockaddr from_socket_addr;
-    socklen_t from_socket_addr_len;
-    ssize_t rx_length;
-    return_statuses return_val = no_messages_received;
+  boost::system::error_code ec;
+  bytes_read = socket_.receive_from(boost::asio::buffer(msg, buf_size), sender_endpoint_, 0, ec);
 
-    bool done = false;
-    while (!done)
-    {
-        from_socket_addr_len = sizeof(from_socket_addr);
-        rx_length = recvfrom(socket_,
-                             (void *) msg,
-                             buf_size,
-                             0,
-                             &from_socket_addr,
-                             &from_socket_addr_len);
-
-        if (rx_length <= 0)
-        {
-            *size = 0;
-            done = true;
-        }
-        else
-        {
-            if ((from_socket_addr_len == sizeof(sockaddr_in)) &&
-                (from_socket_addr.sa_family == AF_INET))
-            {
-                struct sockaddr_in *addr_in = (struct sockaddr_in *) &from_socket_addr;
-
-                if (((remote_addr_ == INADDR_ANY) || (remote_addr_ == addr_in->sin_addr.s_addr)) &&
-                    ((remote_port_ == 0) || (remote_port_ == addr_in->sin_port)))
-                {
-                    *size = (unsigned int) rx_length;
-                    done = true;
-                    return_val = ok;
-                }
-            }
-        }
-    }
-
-    return return_val;
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    return READ_FAILED;
+  }
 }
 
-return_statuses UDPInterface::send(unsigned char *msg, unsigned int size)
+return_statuses UDPInterface::write(unsigned char *msg, const size_t &msg_size)
 {
-    if (!ok_)
-        return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
-    struct sockaddr_in to_socket_addr;
-    memset(&to_socket_addr, 0, sizeof(sockaddr));
-    to_socket_addr.sin_family = AF_INET;
-    to_socket_addr.sin_port = htons((unsigned short) remote_port_);
-    to_socket_addr.sin_addr.s_addr = remote_addr_;
+  boost::system::error_code ec;
+  socket_.send_to(boost::asio::buffer(msg, msg_size), sender_endpoint_, 0, ec);
 
-    ssize_t tx_length;
-    tx_length = sendto(socket_,
-                       (const void *) msg,
-                       size,
-                       0,
-                       (struct sockaddr *) &to_socket_addr,
-                       sizeof(to_socket_addr));
-
-    if (tx_length != size)
-        return send_failed;
-
-    return ok;
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    return WRITE_FAILED;
+  }
 }

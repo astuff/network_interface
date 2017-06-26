@@ -14,13 +14,11 @@
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
   <author email="jkale@autonomoustuff.com">Joe Kale</author>
 
-  <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>message_runtime</run_depend>
 </package>
