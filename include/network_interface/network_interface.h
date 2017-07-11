@@ -23,12 +23,12 @@
 #define NETWORK_INTERFACE_H
 
 //C++ Includes
+#include <cstdio>
 #include <iostream>
 #include <boost/asio.hpp>
 
 //OS Includes
 #include <unistd.h>
-#include <netinet/in.h>
 
 namespace AS
 {
@@ -36,10 +36,13 @@ namespace Network
 {
   enum return_statuses
   {
-    ok = 0,
-    init_failed,
-    no_messages_received,
-    send_failed
+    OK = 0,
+    INIT_FAILED,
+    SOCKET_ERROR,
+    NO_MESSAGES_RECEIVED,
+    READ_FAILED,
+    WRITE_FAILED,
+    CLOSE_FAILED
   };
   
   class UDPInterface
@@ -50,25 +53,21 @@ namespace Network
       ~UDPInterface();
 
       // Called to pass in parameters and open ethernet link
-      return_statuses open(const char *local_address,
-                            const char *remote_address,
-                            int local_port,
-                            int remote_port);
+      return_statuses open(const char *ip_address, const int &port);
 
       // Close the ethernet link
       return_statuses close();
 
-      // Read a message
-      return_statuses read(unsigned char *msg, unsigned int *size, unsigned int buf_size);
+      // Read a message - UDP is datagram-based so you cannot read exactly x bytes.
+      return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
 
       // Send a message
-      return_statuses send(unsigned char *msg, unsigned int size);
+      return_statuses write(unsigned char *msg, const size_t &msg_size);
 
     private:
-      int socket_;
-      in_addr_t remote_addr_;
-      int remote_port_;
-      bool ok_;
+      boost::asio::io_service io_service_;
+      boost::asio::ip::udp::socket socket_;
+      boost::asio::ip::udp::endpoint sender_endpoint_;
   };
   
   class TCPInterface
@@ -79,19 +78,25 @@ namespace Network
       ~TCPInterface();
           
       // Called to pass in parameters and open ethernet link
-      return_statuses open(const char *ip_address, int port);
+      return_statuses open(const char *ip_address, const int &port);
+
       // Close the ethernet link
       return_statuses close();
+
       // Read a message
-      return_statuses read_some(unsigned char *msg, size_t buf_size, size_t &bytes_read);
-      return_statuses read_exactly(unsigned char *msg, size_t buf_size, unsigned int bytes);
+      return_statuses read_some(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
+      return_statuses read_exactly(unsigned char *msg, const size_t &buf_size, const size_t &bytes_to_read);
+
       // Send a message
-      return_statuses send(unsigned char *msg, size_t size);
+      return_statuses write(unsigned char *msg, const size_t &msg_size);
     private:
       boost::asio::io_service io_service_;
       boost::asio::ip::tcp::socket socket_;
-      bool ok_;
   };
+
+  
+  //Utility Functions
+  void ni_error_handler(boost::system::error_code &ec);
 }  
 }
 #endif

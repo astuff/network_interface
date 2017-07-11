@@ -17,18 +17,14 @@
 */
 
 #include <network_interface.h>
-#include <sys/socket.h>
 
-#include <cstring>
-
-using namespace AS::Network;
 using namespace std;
-using namespace boost;
+using namespace AS::Network;
 using boost::asio::ip::tcp;
 
 //Default constructor.
 TCPInterface::TCPInterface() :
-  ok_(false) , socket_(io_service_)
+  socket_(io_service_)
 {
 }
 
@@ -37,72 +33,104 @@ TCPInterface::~TCPInterface()
 {
 }
 
-return_statuses TCPInterface::open(const char *ip_address, int port)
+return_statuses TCPInterface::open(const char *ip_address, const int &port)
 {
+  if (socket_.is_open())
+    return OK;
+
   stringstream sPort;
   sPort << port;
   tcp::resolver res(io_service_);
   tcp::resolver::query query(tcp::v4(), ip_address, sPort.str());
   tcp::resolver::iterator it = res.resolve(query);
+  boost::system::error_code ec;
 
-  try 
+  socket_.connect(*it, ec);
+
+  if (ec.value() == boost::system::errc::success)
   {
-    socket_.connect(*it);
+    return OK;
   }
-  catch (std::exception& e) {
+  else
+  {
+    ni_error_handler(ec);
     close();
-    return init_failed;
+    return INIT_FAILED;
   }
-  
-  ok_ = true;
-  return ok;
 }
 
 return_statuses TCPInterface::close()
 {
-  if (!ok_)
-    return init_failed;
-
-  socket_.close();
-  return ok;
-}
-
-return_statuses TCPInterface::read_exactly(unsigned char *msg, size_t buf_size, unsigned int bytes)
-{
-  if (!ok_)
-    return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
   boost::system::error_code ec;
-  int rcv_size = asio::read(socket_, asio::buffer(msg, buf_size), asio::transfer_exactly(bytes), ec);
-  if(ec)
+  socket_.close(ec);
+
+  if (ec.value() == boost::system::errc::success)
   {
-    printf("error occurred in read_exactly");
-    return init_failed;
+    return OK;
   }
-  return ok;
+  else
+  {
+    ni_error_handler(ec);
+    return CLOSE_FAILED;
+  }
 }
 
-return_statuses TCPInterface::read_some(unsigned char *msg, size_t buf_size, size_t &bytes_read)
+return_statuses TCPInterface::read_some(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
 {
-  if (!ok_)
-    return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
   boost::system::error_code ec;
-  bytes_read = socket_.read_some(asio::buffer(msg, buf_size), ec);
-  if(ec)
+  bytes_read = boost::asio::read(socket_, boost::asio::buffer(msg, buf_size), ec);
+
+  if (ec.value() == boost::system::errc::success)
   {
-    printf("error occurred in read_some");
-    return init_failed;
+    return OK;
   }
-  return ok;
+  else
+  {
+    ni_error_handler(ec);
+    return READ_FAILED;
+  }
 }
 
-return_statuses TCPInterface::send(unsigned char *msg, size_t size)
+return_statuses TCPInterface::read_exactly(unsigned char *msg, const size_t &buf_size, const size_t &bytes_to_read)
 {
-  if (!ok_)
-    return init_failed;
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
 
-  socket_.send(asio::buffer(msg, size));
+  boost::system::error_code ec;
+  boost::asio::read(socket_, boost::asio::buffer(msg, buf_size), boost::asio::transfer_exactly(bytes_to_read), ec);
 
-  return ok;
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    return READ_FAILED;
+  }
+}
+
+return_statuses TCPInterface::write(unsigned char *msg, const size_t &msg_size)
+{
+  if (!socket_.is_open())
+    return SOCKET_ERROR;
+
+  boost::system::error_code ec;
+  boost::asio::write(socket_, boost::asio::buffer(msg, msg_size), ec);
+
+  if (ec.value() == boost::system::errc::success)
+  {
+    return OK;
+  }
+  else
+  {
+    ni_error_handler(ec);
+    return WRITE_FAILED;
+  }
 }
