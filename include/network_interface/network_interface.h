@@ -37,12 +37,14 @@ namespace Network
   enum return_statuses
   {
     OK = 0,
-    INIT_FAILED,
-    SOCKET_ERROR,
-    NO_MESSAGES_RECEIVED,
-    READ_FAILED,
-    WRITE_FAILED,
-    CLOSE_FAILED
+    INIT_FAILED = -1,
+    BAD_PARAM = -2,
+    SOCKET_ERROR = -3,
+    SOCKET_CLOSED = -4,
+    NO_MESSAGES_RECEIVED = -5,
+    READ_FAILED = -6,
+    WRITE_FAILED = -7,
+    CLOSE_FAILED = -8
   };
   
   class UDPInterface
@@ -84,7 +86,7 @@ namespace Network
       return_statuses close();
 
       // Read a message
-      return_statuses read_some(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
+      return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
       return_statuses read_exactly(unsigned char *msg, const size_t &buf_size, const size_t &bytes_to_read);
 
       // Send a message
@@ -93,10 +95,9 @@ namespace Network
       boost::asio::io_service io_service_;
       boost::asio::ip::tcp::socket socket_;
   };
-
   
   //Utility Functions
-  void ni_error_handler(boost::system::error_code &ec);
+  std::string return_status_desc(return_statuses &ret);
 }  
 }
 #endif

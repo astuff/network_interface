@@ -51,9 +51,12 @@ return_statuses UDPInterface::open(const char *ip_address, const int &port)
   {
     return OK;
   }
+  else if (ec.value() == boost::asio::error::invalid_argument)
+  {
+    return BAD_PARAM;
+  }
   else
   {
-    ni_error_handler(ec);
     close();
     return INIT_FAILED;
   }
@@ -62,7 +65,7 @@ return_statuses UDPInterface::open(const char *ip_address, const int &port)
 return_statuses UDPInterface::close()
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   socket_.close(ec);
@@ -73,7 +76,6 @@ return_statuses UDPInterface::close()
   }
   else
   {
-    ni_error_handler(ec);
     return CLOSE_FAILED;
   }
 }
@@ -81,7 +83,7 @@ return_statuses UDPInterface::close()
 return_statuses UDPInterface::read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   bytes_read = socket_.receive_from(boost::asio::buffer(msg, buf_size), sender_endpoint_, 0, ec);
@@ -92,7 +94,6 @@ return_statuses UDPInterface::read(unsigned char *msg, const size_t &buf_size, s
   }
   else
   {
-    ni_error_handler(ec);
     return READ_FAILED;
   }
 }
@@ -100,7 +101,7 @@ return_statuses UDPInterface::read(unsigned char *msg, const size_t &buf_size, s
 return_statuses UDPInterface::write(unsigned char *msg, const size_t &msg_size)
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   socket_.send_to(boost::asio::buffer(msg, msg_size), sender_endpoint_, 0, ec);
@@ -111,7 +112,6 @@ return_statuses UDPInterface::write(unsigned char *msg, const size_t &msg_size)
   }
   else
   {
-    ni_error_handler(ec);
     return WRITE_FAILED;
   }
 }

@@ -51,9 +51,12 @@ return_statuses TCPInterface::open(const char *ip_address, const int &port)
   {
     return OK;
   }
+  else if (ec.value() == boost::asio::error::invalid_argument)
+  {
+    return BAD_PARAM;
+  }
   else
   {
-    ni_error_handler(ec);
     close();
     return INIT_FAILED;
   }
@@ -62,7 +65,7 @@ return_statuses TCPInterface::open(const char *ip_address, const int &port)
 return_statuses TCPInterface::close()
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return OK;
 
   boost::system::error_code ec;
   socket_.close(ec);
@@ -73,15 +76,14 @@ return_statuses TCPInterface::close()
   }
   else
   {
-    ni_error_handler(ec);
     return CLOSE_FAILED;
   }
 }
 
-return_statuses TCPInterface::read_some(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
+return_statuses TCPInterface::read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   bytes_read = boost::asio::read(socket_, boost::asio::buffer(msg, buf_size), ec);
@@ -92,7 +94,6 @@ return_statuses TCPInterface::read_some(unsigned char *msg, const size_t &buf_si
   }
   else
   {
-    ni_error_handler(ec);
     return READ_FAILED;
   }
 }
@@ -100,7 +101,7 @@ return_statuses TCPInterface::read_some(unsigned char *msg, const size_t &buf_si
 return_statuses TCPInterface::read_exactly(unsigned char *msg, const size_t &buf_size, const size_t &bytes_to_read)
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   boost::asio::read(socket_, boost::asio::buffer(msg, buf_size), boost::asio::transfer_exactly(bytes_to_read), ec);
@@ -111,7 +112,6 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg, const size_t &buf
   }
   else
   {
-    ni_error_handler(ec);
     return READ_FAILED;
   }
 }
@@ -119,7 +119,7 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg, const size_t &buf
 return_statuses TCPInterface::write(unsigned char *msg, const size_t &msg_size)
 {
   if (!socket_.is_open())
-    return SOCKET_ERROR;
+    return SOCKET_CLOSED;
 
   boost::system::error_code ec;
   boost::asio::write(socket_, boost::asio::buffer(msg, msg_size), ec);
@@ -130,7 +130,6 @@ return_statuses TCPInterface::write(unsigned char *msg, const size_t &msg_size)
   }
   else
   {
-    ni_error_handler(ec);
     return WRITE_FAILED;
   }
 }

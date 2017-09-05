@@ -39,7 +39,7 @@ include_directories(include/${PROJECT_NAME}
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-  src/util.cpp
+  src/utils.cpp
   src/udp_interface.cpp
   src/tcp_interface.cpp
 )
