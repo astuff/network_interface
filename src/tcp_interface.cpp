@@ -80,6 +80,11 @@ return_statuses TCPInterface::close()
   }
 }
 
+bool TCPInterface::is_open()
+{
+  return socket_.is_open();
+}
+
 return_statuses TCPInterface::read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
 {
   if (!socket_.is_open())

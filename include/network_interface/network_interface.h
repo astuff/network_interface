@@ -60,6 +60,9 @@ namespace Network
       // Close the ethernet link
       return_statuses close();
 
+      // Check on the status of the link
+      bool is_open();
+
       // Read a message - UDP is datagram-based so you cannot read exactly x bytes.
       return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
 
@@ -84,6 +87,9 @@ namespace Network
 
       // Close the ethernet link
       return_statuses close();
+
+      // Check on the status of the link
+      bool is_open();
 
       // Read a message
       return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
