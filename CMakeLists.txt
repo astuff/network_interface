@@ -3,7 +3,6 @@ project(network_interface)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
   std_msgs
   message_generation
 )
