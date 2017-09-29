@@ -7,8 +7,8 @@
 
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
 
-  <url type="bugtracker">https://bitbucket.org/autonomoustuff/network_interface/issues</url>
-  <url type="repository">https://bitbucket.org/autonomoustuff/network_interface</url>
+  <url type="bugtracker">https://github.com/astuff/network_interface/issues</url>
+  <url type="repository">https://github.com/astuff/network_interface</url>
 
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
