@@ -85,7 +85,9 @@ bool UDPInterface::is_open()
   return socket_.is_open();
 }
 
-return_statuses UDPInterface::read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read)
+return_statuses UDPInterface::read(unsigned char *msg,
+                                   const size_t &buf_size,
+                                   size_t &bytes_read)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;

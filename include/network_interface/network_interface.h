@@ -64,7 +64,9 @@ namespace Network
       bool is_open();
 
       // Read a message - UDP is datagram-based so you cannot read exactly x bytes.
-      return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
+      return_statuses read(unsigned char *msg,
+                           const size_t &buf_size,
+                           size_t &bytes_read);
 
       // Send a message
       return_statuses write(unsigned char *msg, const size_t &msg_size);
@@ -83,7 +85,8 @@ namespace Network
       ~TCPInterface();
           
       // Called to pass in parameters and open ethernet link
-      return_statuses open(const char *ip_address, const int &port);
+      return_statuses open(const char *ip_address,
+                           const int &port);
 
       // Close the ethernet link
       return_statuses close();
@@ -92,8 +95,12 @@ namespace Network
       bool is_open();
 
       // Read a message
-      return_statuses read(unsigned char *msg, const size_t &buf_size, size_t &bytes_read);
-      return_statuses read_exactly(unsigned char *msg, const size_t &buf_size, const size_t &bytes_to_read);
+      return_statuses read(unsigned char *msg,
+                           const size_t &buf_size,
+                           size_t &bytes_read);
+      return_statuses read_exactly(unsigned char *msg,
+                                   const size_t &buf_size,
+                                   const size_t &bytes_to_read);
 
       // Send a message
       return_statuses write(unsigned char *msg, const size_t &msg_size);
@@ -103,7 +110,7 @@ namespace Network
   };
   
   //Utility Functions
-  std::string return_status_desc(return_statuses &ret);
+  std::string return_status_desc(const return_statuses &ret);
 }  
 }
 #endif

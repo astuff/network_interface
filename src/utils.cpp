@@ -18,7 +18,7 @@
 
 #include <network_interface.h>
 
-std::string AS::Network::return_status_desc(return_statuses &ret)
+std::string AS::Network::return_status_desc(const return_statuses &ret)
 {
   std::string status_string;
 
