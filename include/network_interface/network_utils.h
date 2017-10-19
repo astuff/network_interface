@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <vector>
 #include <typeinfo>
+#include <climits>
 
 namespace AS
 {
@@ -36,24 +37,31 @@ namespace Network
 
 	// little-endian
 	template<typename T>
-		T read_le(unsigned char* bufArray,
-							const unsigned int& size,
-							const unsigned int& offset,
+		T read_le(uint8_t* bufArray,
+							const uint32_t& size,
+							const uint32_t& offset,
 							const float& factor,
-							const unsigned int& valueOffset)
+							const uint32_t& valueOffset)
 	{
-		unsigned long rcvData = 0;
+		uint64_t rcvData = 0;
 
-		for (unsigned int i = size; i > 0; i--) {
+		for (uint32_t i = size; i > 0; i--) {
 			rcvData <<= 8;
 			//Need to use -1 because array is 0-based
 			//and offset is not.
 			rcvData |= bufArray[(offset - 1) + i];
 		}
 
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+    long double opValue;
 
-		return retVal;
+    //Cut down to size and reinterpret bytes.
+    T bytes = rcvData;
+    //Convert to long double for mathematic operations.
+    opValue = static_cast<long double>(bytes);
+    opValue = opValue * factor - valueOffset;
+
+    //Convert back to output type.
+    return static_cast<T>(opValue);
 	};
 
 	template<typename T>
@@ -101,9 +109,16 @@ namespace Network
 			rcvData |= bufArray[(offset) + i];
 		}
 
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+    long double opValue;
 
-		return retVal;
+    //Cut down to size and reinterpret bytes.
+    T bytes = rcvData;
+    //Convert to long double for mathematic operations.
+    opValue = static_cast<long double>(bytes);
+    opValue = opValue * factor - valueOffset;
+
+    //Convert back to output type.
+    return static_cast<T>(opValue);
 	};
 
 	template<typename T>
