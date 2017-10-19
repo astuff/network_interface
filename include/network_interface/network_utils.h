@@ -23,7 +23,6 @@
 #include <cstdint>
 #include <vector>
 #include <typeinfo>
-#include <climits>
 
 namespace AS
 {
