@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 
 //OS Includes
 #include <unistd.h>
@@ -33,7 +34,8 @@ namespace Network
     NO_MESSAGES_RECEIVED = -5,
     READ_FAILED = -6,
     WRITE_FAILED = -7,
-    CLOSE_FAILED = -8
+    CLOSE_FAILED = -8,
+    SOCKET_TIMEOUT = -9
   };
   
   class UDPInterface
@@ -96,6 +98,13 @@ namespace Network
     private:
       boost::asio::io_service io_service_;
       boost::asio::ip::tcp::socket socket_;
+      boost::system::error_code error_;
+      bool timeout_triggered_;
+      bool message_received_;
+      size_t bytes_read_;
+
+      void timeout_handler(const boost::system::error_code& error);
+      void read_handler(const boost::system::error_code& error, size_t bytes_read);
   };
   
   //Utility Functions
