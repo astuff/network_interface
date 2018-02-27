@@ -74,7 +74,6 @@ bool TCPInterface::is_open()
   return socket_.is_open();
 }
 
-// Socket timeout handler
 void TCPInterface::timeout_handler(const boost::system::error_code& error) 
 { 
   // Set the timeout flag and set the error code appropriately
@@ -82,36 +81,34 @@ void TCPInterface::timeout_handler(const boost::system::error_code& error)
   error_.assign(boost::system::errc::timed_out, boost::system::system_category());
 } 
 
-// Socket read handler
 void TCPInterface::read_handler(const boost::system::error_code& error, size_t bytes_read)
 {
   // If the operation was not aborted, store the bytes that were read and set the read flag
   if (error != boost::asio::error::operation_aborted)
+  {
     message_received_ = true;
     bytes_read_ = bytes_read;
+  }
 }
 
 return_statuses TCPInterface::read(unsigned char *msg,
                                    const size_t &buf_size,
                                    size_t &bytes_read)
 {
-  // Validate that the socket is connected
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
-  // Set timemout and read flags
   timeout_triggered_ = false;
   message_received_ = false;
 
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
-  // Set a timer to run asychronously
   boost::asio::deadline_timer timer(io_service_,
-                                    boost::posix_time::milliseconds(10));
+                                    boost::posix_time::milliseconds(5));
   timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
                                this,
                                boost::asio::placeholders::error));
-  // Read the socket asychronously
+
   boost::asio::async_read(socket_,
                           boost::asio::buffer(msg, buf_size),
                           boost::bind(&TCPInterface::read_handler,
@@ -119,23 +116,22 @@ return_statuses TCPInterface::read(unsigned char *msg,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   // Run until a handler is called
-  while (io_service_.run_one())
+  io_service_.run_one();
+
+  // If there is a callback with a received message, store the read bytes and cancel the timeout timer
+  if (message_received_)
   {
-    // If there is a callback with a received message, store the read bytes and cancel the timeout timer
-    if (message_received_)
-    {
-      timer.cancel();
-      bytes_read = bytes_read_;
-    }
-    // If the timeout is reached, cancel the socket operation
-    else if (timeout_triggered_)
-    {
-      socket_.cancel();
-    }
+    timer.cancel();
+    bytes_read = bytes_read_;
   }
+  // If the timeout is reached, cancel the socket operation
+  else if (timeout_triggered_)
+  {
+    socket_.cancel();
+  }
+  // Reset the io service so that it is available for the next call to TCPInterface::read
   io_service_.reset();
 
-  // Return the correct error code
   if (error_.value() == boost::system::errc::success)
   {
     return OK;
