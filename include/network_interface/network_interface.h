@@ -88,7 +88,8 @@ namespace Network
       // Read a message
       return_statuses read(unsigned char *msg,
                            const size_t &buf_size,
-                           size_t &bytes_read);
+                           size_t &bytes_read,
+                           int timeout_ms = 5); // Optional timeout argument, in milliseconds
       return_statuses read_exactly(unsigned char *msg,
                                    const size_t &buf_size,
                                    const size_t &bytes_to_read);

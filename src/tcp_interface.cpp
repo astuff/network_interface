@@ -93,7 +93,8 @@ void TCPInterface::read_handler(const boost::system::error_code& error, size_t b
 
 return_statuses TCPInterface::read(unsigned char *msg,
                                    const size_t &buf_size,
-                                   size_t &bytes_read)
+                                   size_t &bytes_read,
+                                   int timeout_ms)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
@@ -104,7 +105,7 @@ return_statuses TCPInterface::read(unsigned char *msg,
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
   boost::asio::deadline_timer timer(io_service_,
-                                    boost::posix_time::milliseconds(5));
+                                    boost::posix_time::milliseconds(timeout_ms));
   timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
                                this,
                                boost::asio::placeholders::error));
