@@ -149,17 +149,53 @@ return_statuses TCPInterface::read(unsigned char *msg,
 
 return_statuses TCPInterface::read_exactly(unsigned char *msg,
                                            const size_t &buf_size,
-                                           const size_t &bytes_to_read)
+                                           const size_t &bytes_to_read,
+                                           int timeout_ms)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
-  boost::system::error_code ec;
-  boost::asio::read(socket_, boost::asio::buffer(msg, buf_size), boost::asio::transfer_exactly(bytes_to_read), ec);
+  timeout_triggered_ = false;
+  message_received_ = false;
 
-  if (ec.value() == boost::system::errc::success)
+  error_.assign(boost::system::errc::success, boost::system::system_category());
+
+  boost::asio::deadline_timer timer(io_service_,
+                                    boost::posix_time::milliseconds(timeout_ms));
+  timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
+                               this,
+                               boost::asio::placeholders::error));
+
+  boost::asio::async_read(socket_,
+                          boost::asio::buffer(msg, buf_size),
+                          boost::asio::transfer_exactly(bytes_to_read),
+                          boost::bind(&TCPInterface::read_handler,
+                                      this,
+                                      boost::asio::placeholders::error,
+                                      boost::asio::placeholders::bytes_transferred));
+  // Run until a handler is called
+  io_service_.run_one();
+
+  // If there is a callback with a received message, cancel the timeout timer
+  if (message_received_)
+  {
+    timer.cancel();
+  }
+  // If the timeout is reached, cancel the socket operation
+  else if (timeout_triggered_)
+  {
+    socket_.cancel();
+  }
+  // Reset the io service so that it is available for the next call to TCPInterface::read_exactly
+  io_service_.reset();
+
+  if (error_.value() == boost::system::errc::success)
   {
     return OK;
+  }
+  else if (error_.value() == boost::system::errc::timed_out)
+  {
+    return SOCKET_TIMEOUT;
   }
   else
   {
