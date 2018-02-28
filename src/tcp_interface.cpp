@@ -75,20 +75,16 @@ bool TCPInterface::is_open()
 }
 
 void TCPInterface::timeout_handler(const boost::system::error_code& error) 
-{ 
-  // Set the timeout flag and set the error code appropriately
-  timeout_triggered_ = true;
-  error_.assign(boost::system::errc::timed_out, boost::system::system_category());
+{ // If the operation was not aborted, store the bytes that were read and set the read flag
+  if (error != boost::asio::error::operation_aborted)
+  {
+    error_.assign(boost::system::errc::timed_out, boost::system::system_category());
+  }
 } 
 
 void TCPInterface::read_handler(const boost::system::error_code& error, size_t bytes_read)
 {
-  // If the operation was not aborted, store the bytes that were read and set the read flag
-  if (error != boost::asio::error::operation_aborted)
-  {
-    message_received_ = true;
-    bytes_read_ = bytes_read;
-  }
+  bytes_read_ = bytes_read;
 }
 
 return_statuses TCPInterface::read(unsigned char *msg,
@@ -99,13 +95,10 @@ return_statuses TCPInterface::read(unsigned char *msg,
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
-  timeout_triggered_ = false;
-  message_received_ = false;
-
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
-  boost::asio::deadline_timer timer(io_service_,
-                                    boost::posix_time::milliseconds(timeout_ms));
+  boost::asio::deadline_timer timer(io_service_);
+  timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
   timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
                                this,
                                boost::asio::placeholders::error));
@@ -117,18 +110,17 @@ return_statuses TCPInterface::read(unsigned char *msg,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   // Run until a handler is called
-  io_service_.run_one();
-
-  // If there is a callback with a received message, store the read bytes and cancel the timeout timer
-  if (message_received_)
+  while(io_service_.run_one())
   {
-    timer.cancel();
-    bytes_read = bytes_read_;
-  }
-  // If the timeout is reached, cancel the socket operation
-  else if (timeout_triggered_)
-  {
-    socket_.cancel();
+    if(error_.value() == boost::system::errc::success)
+    {
+      timer.cancel();
+      bytes_read = bytes_read_;
+    }
+    else if (error_.value() == boost::system::errc::timed_out)
+    {
+      socket_.cancel();
+    }
   }
   // Reset the io service so that it is available for the next call to TCPInterface::read
   io_service_.reset();
@@ -155,13 +147,10 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
-  timeout_triggered_ = false;
-  message_received_ = false;
-
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
-  boost::asio::deadline_timer timer(io_service_,
-                                    boost::posix_time::milliseconds(timeout_ms));
+  boost::asio::deadline_timer timer(io_service_);
+  timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
   timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
                                this,
                                boost::asio::placeholders::error));
@@ -174,17 +163,16 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   // Run until a handler is called
-  io_service_.run_one();
-
-  // If there is a callback with a received message, cancel the timeout timer
-  if (message_received_)
+  while(io_service_.run_one())
   {
-    timer.cancel();
-  }
-  // If the timeout is reached, cancel the socket operation
-  else if (timeout_triggered_)
-  {
-    socket_.cancel();
+    if(error_.value() == boost::system::errc::success)
+    {
+      timer.cancel();
+    }
+    else if (error_.value() == boost::system::errc::timed_out)
+    {
+      socket_.cancel();
+    }
   }
   // Reset the io service so that it is available for the next call to TCPInterface::read_exactly
   io_service_.reset();
