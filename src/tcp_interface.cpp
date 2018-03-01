@@ -98,10 +98,14 @@ return_statuses TCPInterface::read(unsigned char *msg,
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
   boost::asio::deadline_timer timer(io_service_);
-  timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
-  timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
-                               this,
-                               boost::asio::placeholders::error));
+  // If requested timeout duration is set to 0 ms, don't set a deadline
+  if (timeout_ms > 0)
+  {
+    timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
+    timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
+                                this,
+                                boost::asio::placeholders::error));
+  }
 
   boost::asio::async_read(socket_,
                           boost::asio::buffer(msg, buf_size),
@@ -150,10 +154,14 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
   boost::asio::deadline_timer timer(io_service_);
-  timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
-  timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
-                               this,
-                               boost::asio::placeholders::error));
+  // If requested timeout duration is set to 0 ms, don't set a deadline
+  if (timeout_ms > 0)
+  {
+    timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
+    timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
+                                this,
+                                boost::asio::placeholders::error));
+  }
 
   boost::asio::async_read(socket_,
                           boost::asio::buffer(msg, buf_size),
