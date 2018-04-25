@@ -40,16 +40,9 @@ namespace Network
 			rcvData |= bufArray[(offset - 1) + i];
 		}
 
-    long double opValue;
+		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
 
-    //Cut down to size and reinterpret bytes.
-    T bytes = rcvData;
-    //Convert to long double for mathematic operations.
-    opValue = static_cast<long double>(bytes);
-    opValue = opValue * factor - valueOffset;
-
-    //Convert back to output type.
-    return static_cast<T>(opValue);
+    	return retVal;
 	};
 
 	template<typename T>
@@ -97,16 +90,9 @@ namespace Network
 			rcvData |= bufArray[(offset) + i];
 		}
 
-    long double opValue;
+		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
 
-    //Cut down to size and reinterpret bytes.
-    T bytes = rcvData;
-    //Convert to long double for mathematic operations.
-    opValue = static_cast<long double>(bytes);
-    opValue = opValue * factor - valueOffset;
-
-    //Convert back to output type.
-    return static_cast<T>(opValue);
+		return retVal;
 	};
 
 	template<typename T>
