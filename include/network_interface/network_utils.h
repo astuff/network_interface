@@ -24,6 +24,16 @@ namespace Network
     LE
   };
 
+  	inline int system_is_big_endian(uint32_t input)
+	{
+		union {
+			uint32_t i;
+			char c[4];
+		} big_int = {input};
+
+		return big_int.c[0] == 1; 
+	}
+
 	// little-endian
 	template<typename T>
 		T read_le(uint8_t* bufArray,
@@ -42,7 +52,7 @@ namespace Network
 		}
 
 		T retVal = 0;
-		std::memcpy(&retVal, &rcvData, sizeof(T));
+		std::memcpy(&retVal, (system_is_big_endian(rcvData)) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
 		retVal *= (T) factor;
 		retVal += valueOffset;
 
@@ -95,7 +105,7 @@ namespace Network
 		}
 		
 		T retVal;
-		std::memcpy(&retVal, &rcvData, sizeof(T));
+		std::memcpy(&retVal, (system_is_big_endian(rcvData)) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
 		retVal *= (T) factor;
 		retVal += valueOffset;
 
