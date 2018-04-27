@@ -13,7 +13,6 @@
 #include <vector>
 #include <typeinfo>
 #include <cstring>
-#include <stdio.h>
 
 namespace AS
 {
