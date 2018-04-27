@@ -18,7 +18,7 @@ TEST(TCPInterface, testReadBEDouble)
 
 TEST(TCPInterface, testReadBEInt)
 {
-    uint32_t in = 0x34FB5E38; //1234567891 as  hex Int
+    uint32_t in = 0x34FB5E38; //888888888 as  hex Int
     uint8_t bytes[4] = { 0x34, 0xFB, 0x5E, 0x38};
     ASSERT_EQ(888888888, AS::Network::read_be<uint32_t>(bytes, 4, 0));
 }
