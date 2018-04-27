@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 #include <typeinfo>
+#include <cstring>
+#include <stdio.h>
 
 namespace AS
 {
@@ -40,7 +42,10 @@ namespace Network
 			rcvData |= bufArray[(offset - 1) + i];
 		}
 
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+		T retVal = 0;
+		std::memcpy(&retVal, &rcvData, sizeof(T));
+		retVal *= (T) factor;
+		retVal += valueOffset;
 
     	return retVal;
 	};
@@ -83,14 +88,17 @@ namespace Network
 							const float& factor,
 							const unsigned int& valueOffset)
 	{
-		unsigned long rcvData = 0;
+		uint64_t rcvData = 0;
 
 		for (unsigned int i = 0; i <  size; i++) {
 			rcvData <<= 8;
 			rcvData |= bufArray[(offset) + i];
 		}
-
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+		
+		T retVal;
+		std::memcpy(&retVal, &rcvData, sizeof(T));
+		retVal *= (T) factor;
+		retVal += valueOffset;
 
 		return retVal;
 	};
