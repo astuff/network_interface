@@ -24,7 +24,7 @@ namespace Network
     LE
   };
 
-  	inline int system_is_big_endian()
+  	inline bool system_is_big_endian()
 	{
 		union {
 			uint32_t i;
