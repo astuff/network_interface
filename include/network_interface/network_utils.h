@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 #include <typeinfo>
+#include <cstring>
 
 namespace AS
 {
@@ -22,6 +23,16 @@ namespace Network
     BE = 0,
     LE
   };
+
+  	inline bool system_is_big_endian()
+	{
+		union {
+			uint32_t i;
+			char c[4];
+		} big_int = {0x12345678};
+
+		return big_int.c[0] == 1; 
+	}
 
 	// little-endian
 	template<typename T>
@@ -40,7 +51,10 @@ namespace Network
 			rcvData |= bufArray[(offset - 1) + i];
 		}
 
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+		T retVal = 0;
+		std::memcpy(&retVal, (system_is_big_endian()) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
+		retVal *= (T) factor;
+		retVal += valueOffset;
 
     	return retVal;
 	};
@@ -83,14 +97,17 @@ namespace Network
 							const float& factor,
 							const unsigned int& valueOffset)
 	{
-		unsigned long rcvData = 0;
+		uint64_t rcvData = 0;
 
 		for (unsigned int i = 0; i <  size; i++) {
 			rcvData <<= 8;
 			rcvData |= bufArray[(offset) + i];
 		}
-
-		T retVal = (*(reinterpret_cast<T *>(&rcvData)) * (T)factor) - valueOffset;
+		
+		T retVal;
+		std::memcpy(&retVal, (system_is_big_endian()) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
+		retVal *= (T) factor;
+		retVal += valueOffset;
 
 		return retVal;
 	};
