@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 #include <typeinfo>
+#include <cstring>
 
 namespace AS
 {
