@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(network_interface)
 
-add_definitions(-std=c++11 -Wall -Wextra -DBUILD_ROS)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   std_msgs
@@ -29,8 +26,6 @@ catkin_package(
   LIBRARIES network_interface
   CATKIN_DEPENDS std_msgs message_runtime
 )
-
-catkin_add_gtest(network_tests test/network_interface_test.cpp)
 
 ###########
 ## Build ##
