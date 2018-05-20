@@ -7,17 +7,16 @@
 
 #include <network_interface.h>
 
-using namespace std;
-using namespace AS::Network;
+using namespace AS::Network;  // NOLINT
 using boost::asio::ip::udp;
 
-//Default constructor.
+// Default constructor.
 UDPInterface::UDPInterface() :
   socket_(io_service_)
 {
 }
 
-//Default destructor.
+// Default destructor.
 UDPInterface::~UDPInterface()
 {
 }
@@ -27,7 +26,7 @@ return_statuses UDPInterface::open(const char *ip_address, const int &port)
   if (socket_.is_open())
     return OK;
 
-  stringstream sPort;
+  std::stringstream sPort;
   sPort << port;
   udp::resolver res(io_service_);
   udp::resolver::query query(udp::v4(), ip_address, sPort.str());
