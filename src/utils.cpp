@@ -5,6 +5,7 @@
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
+#include <string>
 #include <network_interface.h>
 
 std::string AS::Network::return_status_desc(const return_statuses &ret)

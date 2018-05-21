@@ -7,17 +7,16 @@
 
 #include <network_interface.h>
 
-using namespace std;
-using namespace AS::Network;
+using namespace AS::Network;  // NOLINT
 using boost::asio::ip::tcp;
 
-//Default constructor.
+// Default constructor.
 TCPInterface::TCPInterface() :
   socket_(io_service_)
 {
 }
 
-//Default destructor.
+// Default destructor.
 TCPInterface::~TCPInterface()
 {
 }
@@ -27,7 +26,7 @@ return_statuses TCPInterface::open(const char *ip_address, const int &port)
   if (socket_.is_open())
     return OK;
 
-  stringstream sPort;
+  std::stringstream sPort;
   sPort << port;
   tcp::resolver res(io_service_);
   tcp::resolver::query query(tcp::v4(), ip_address, sPort.str());
@@ -74,13 +73,14 @@ bool TCPInterface::is_open()
   return socket_.is_open();
 }
 
-void TCPInterface::timeout_handler(const boost::system::error_code& error) 
-{ // If the operation was not aborted, store the bytes that were read and set the read flag
+void TCPInterface::timeout_handler(const boost::system::error_code& error)
+{
+  // If the operation was not aborted, store the bytes that were read and set the read flag
   if (error != boost::asio::error::operation_aborted)
   {
     error_.assign(boost::system::errc::timed_out, boost::system::system_category());
   }
-} 
+}
 
 void TCPInterface::read_handler(const boost::system::error_code& error, size_t bytes_read)
 {
@@ -103,8 +103,8 @@ return_statuses TCPInterface::read(unsigned char *msg,
   {
     timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
     timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
-                                this,
-                                boost::asio::placeholders::error));
+                                 this,
+                                 boost::asio::placeholders::error));
   }
 
   boost::asio::async_read(socket_,
@@ -114,9 +114,9 @@ return_statuses TCPInterface::read(unsigned char *msg,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   // Run until a handler is called
-  while(io_service_.run_one())
+  while (io_service_.run_one())
   {
-    if(error_.value() == boost::system::errc::success)
+    if (error_.value() == boost::system::errc::success)
     {
       timer.cancel();
       bytes_read = bytes_read_;
@@ -144,9 +144,9 @@ return_statuses TCPInterface::read(unsigned char *msg,
 }
 
 return_statuses TCPInterface::read_exactly(unsigned char *msg,
-                                           const size_t &buf_size,
-                                           const size_t &bytes_to_read,
-                                           int timeout_ms)
+    const size_t &buf_size,
+    const size_t &bytes_to_read,
+    int timeout_ms)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
@@ -159,8 +159,8 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
   {
     timer.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
     timer.async_wait(boost::bind(&TCPInterface::timeout_handler,
-                                this,
-                                boost::asio::placeholders::error));
+                                 this,
+                                 boost::asio::placeholders::error));
   }
 
   boost::asio::async_read(socket_,
@@ -171,9 +171,9 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   // Run until a handler is called
-  while(io_service_.run_one())
+  while (io_service_.run_one())
   {
-    if(error_.value() == boost::system::errc::success)
+    if (error_.value() == boost::system::errc::success)
     {
       timer.cancel();
     }
