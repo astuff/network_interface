@@ -30,7 +30,10 @@ catkin_package(
   CATKIN_DEPENDS std_msgs message_runtime
 )
 
-catkin_add_gtest(network_tests test/network_interface_test.cpp)
+if(CATKIN_ENABLE_TESTING)
+  catkin_add_gtest(${PROJECT_NAME}_tests test/network_interface_test.cpp)
+  target_link_libraries(${PROJECT_NAME}_tests ${catkin_LIBRARIES})
+endif()
 
 ###########
 ## Build ##
