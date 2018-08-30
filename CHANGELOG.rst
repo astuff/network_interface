@@ -2,8 +2,8 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2018-08-30)
+------------------
 * Merge pull request `#13 <https://github.com/astuff/network_interface/issues/13>`_ from astuff/maint/remove_unused_variables_in_test
 * Minor linting stuff.
 * Implementing proper dependencies for rosunit.
