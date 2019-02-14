@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-get update -qq
+            apt update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -26,9 +26,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/kinetic/setup.bash
             cd ..
             catkin run_tests
-            catkin_test_results build/network_interface
+            catkin_test_results
     working_directory: ~/src
 
   lunar:
@@ -39,7 +40,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-get update -qq
+            apt update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -57,9 +58,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/lunar/setup.bash
             cd ..
             catkin run_tests
-            catkin_test_results build/network_interface
+            catkin_test_results
     working_directory: ~/src
 
   melodic:
@@ -88,9 +90,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/melodic/setup.bash
             cd ..
             catkin run_tests
-            catkin_test_results build/network_interface
+            catkin_test_results
     working_directory: ~/src
 
 workflows:
