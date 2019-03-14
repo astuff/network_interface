@@ -57,13 +57,7 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-roslint_cpp(
-  include/${PROJECT_NAME}/network_interface.h
-  include/${PROJECT_NAME}/network_utils.h
-  src/tcp_interface.cpp
-  src/udp_interface.cpp
-  src/utils.cpp
-)
+roslint_cpp()
 
 #############
 ## Install ##
