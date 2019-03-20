@@ -59,6 +59,10 @@ target_link_libraries(${PROJECT_NAME}
 
 roslint_cpp()
 
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+endif()
+
 #############
 ## Install ##
 #############
