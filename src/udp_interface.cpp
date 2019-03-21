@@ -19,15 +19,10 @@ UDPInterface::UDPInterface() :
 {
 }
 
-// Default destructor.
-UDPInterface::~UDPInterface()
-{
-}
-
-return_statuses UDPInterface::open(std::string ip_address, const int &port)
+ReturnStatuses UDPInterface::open(std::string ip_address, const int &port)
 {
   if (socket_.is_open())
-    return OK;
+    return ReturnStatuses::OK;
 
   std::stringstream sPort;
   sPort << port;
@@ -40,35 +35,31 @@ return_statuses UDPInterface::open(std::string ip_address, const int &port)
 
   if (ec.value() == boost::system::errc::success)
   {
-    return OK;
+    return ReturnStatuses::OK;
   }
   else if (ec.value() == boost::asio::error::invalid_argument)
   {
-    return BAD_PARAM;
+    return ReturnStatuses::BAD_PARAM;
   }
   else
   {
     close();
-    return INIT_FAILED;
+    return ReturnStatuses::INIT_FAILED;
   }
 }
 
-return_statuses UDPInterface::close()
+ReturnStatuses UDPInterface::close()
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
   socket_.close(ec);
 
   if (ec.value() == boost::system::errc::success)
-  {
-    return OK;
-  }
+    return ReturnStatuses::OK;
   else
-  {
-    return CLOSE_FAILED;
-  }
+    return ReturnStatuses::CLOSE_FAILED;
 }
 
 bool UDPInterface::is_open()
@@ -76,39 +67,31 @@ bool UDPInterface::is_open()
   return socket_.is_open();
 }
 
-return_statuses UDPInterface::read(std::vector<uint8_t> *msg, size_t *bytes_read)
+ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg, size_t *bytes_read)
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
   msg->assign(10000, 0);
   *bytes_read = socket_.receive_from(boost::asio::buffer(*msg), sender_endpoint_, 0, ec);
 
   if (ec.value() == boost::system::errc::success)
-  {
-    return OK;
-  }
+    return ReturnStatuses::OK;
   else
-  {
-    return READ_FAILED;
-  }
+    return ReturnStatuses::READ_FAILED;
 }
 
-return_statuses UDPInterface::write(const std::vector<uint8_t> &msg)
+ReturnStatuses UDPInterface::write(const std::vector<uint8_t> &msg)
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
   socket_.send_to(boost::asio::buffer(msg), sender_endpoint_, 0, ec);
 
   if (ec.value() == boost::system::errc::success)
-  {
-    return OK;
-  }
+    return ReturnStatuses::OK;
   else
-  {
-    return WRITE_FAILED;
-  }
+    return ReturnStatuses::WRITE_FAILED;
 }

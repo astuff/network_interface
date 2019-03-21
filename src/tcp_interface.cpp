@@ -19,15 +19,10 @@ TCPInterface::TCPInterface() :
 {
 }
 
-// Default destructor.
-TCPInterface::~TCPInterface()
-{
-}
-
-return_statuses TCPInterface::open(std::string ip_address, const int &port)
+ReturnStatuses TCPInterface::open(std::string ip_address, const int &port)
 {
   if (socket_.is_open())
-    return OK;
+    return ReturnStatuses::OK;
 
   std::stringstream sPort;
   sPort << port;
@@ -40,35 +35,31 @@ return_statuses TCPInterface::open(std::string ip_address, const int &port)
 
   if (ec.value() == boost::system::errc::success)
   {
-    return OK;
+    return ReturnStatuses::OK;
   }
   else if (ec.value() == boost::asio::error::invalid_argument)
   {
-    return BAD_PARAM;
+    return ReturnStatuses::BAD_PARAM;
   }
   else
   {
     close();
-    return INIT_FAILED;
+    return ReturnStatuses::INIT_FAILED;
   }
 }
 
-return_statuses TCPInterface::close()
+ReturnStatuses TCPInterface::close()
 {
   if (!socket_.is_open())
-    return OK;
+    return ReturnStatuses::OK;
 
   boost::system::error_code ec;
   socket_.close(ec);
 
   if (ec.value() == boost::system::errc::success)
-  {
-    return OK;
-  }
+    return ReturnStatuses::OK;
   else
-  {
-    return CLOSE_FAILED;
-  }
+    return ReturnStatuses::CLOSE_FAILED;
 }
 
 bool TCPInterface::is_open()
@@ -90,12 +81,12 @@ void TCPInterface::read_handler(const boost::system::error_code& error, size_t b
   bytes_read_ = bytes_read;
 }
 
-return_statuses TCPInterface::read(std::vector<uint8_t> *msg,
+ReturnStatuses TCPInterface::read(std::vector<uint8_t> *msg,
                                    size_t &bytes_read,
                                    int timeout_ms)
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
@@ -134,22 +125,22 @@ return_statuses TCPInterface::read(std::vector<uint8_t> *msg,
 
   if (error_.value() == boost::system::errc::success)
   {
-    return OK;
+    return ReturnStatuses::OK;
   }
   else if (error_.value() == boost::system::errc::timed_out)
   {
-    return SOCKET_TIMEOUT;
+    return ReturnStatuses::SOCKET_TIMEOUT;
   }
   else
   {
-    return READ_FAILED;
+    return ReturnStatuses::READ_FAILED;
   }
 }
 
-return_statuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size_t &bytes_to_read, int timeout_ms)
+ReturnStatuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size_t &bytes_to_read, int timeout_ms)
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
@@ -187,32 +178,32 @@ return_statuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size
 
   if (error_.value() == boost::system::errc::success)
   {
-    return OK;
+    return ReturnStatuses::OK;
   }
   else if (error_.value() == boost::system::errc::timed_out)
   {
-    return SOCKET_TIMEOUT;
+    return ReturnStatuses::SOCKET_TIMEOUT;
   }
   else
   {
-    return READ_FAILED;
+    return ReturnStatuses::READ_FAILED;
   }
 }
 
-return_statuses TCPInterface::write(const std::vector<uint8_t> &msg)
+ReturnStatuses TCPInterface::write(const std::vector<uint8_t> &msg)
 {
   if (!socket_.is_open())
-    return SOCKET_CLOSED;
+    return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
   boost::asio::write(socket_, boost::asio::buffer(msg), ec);
 
   if (ec.value() == boost::system::errc::success)
   {
-    return OK;
+    return ReturnStatuses::OK;
   }
   else
   {
-    return WRITE_FAILED;
+    return ReturnStatuses::WRITE_FAILED;
   }
 }

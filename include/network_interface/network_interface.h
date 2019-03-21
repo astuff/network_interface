@@ -26,7 +26,7 @@ namespace AS
 {
 namespace Network
 {
-enum return_statuses
+enum class ReturnStatuses
 {
   OK = 0,
   INIT_FAILED = -1,
@@ -45,22 +45,20 @@ class UDPInterface
 public:
   UDPInterface();
 
-  ~UDPInterface();
-
   // Called to pass in parameters and open ethernet link
-  return_statuses open(std::string ip_address, const int &port);
+  ReturnStatuses open(std::string ip_address, const int &port);
 
   // Close the ethernet link
-  return_statuses close();
+  ReturnStatuses close();
 
   // Check on the status of the link
   bool is_open();
 
   // Read a message - UDP is datagram-based so you cannot read exactly x bytes.
-  return_statuses read(std::vector<uint8_t> *msg, size_t *bytes_read);
+  ReturnStatuses read(std::vector<uint8_t> *msg, size_t *bytes_read);
 
   // Send a message
-  return_statuses write(const std::vector<uint8_t>& msg);
+  ReturnStatuses write(const std::vector<uint8_t>& msg);
 
 private:
   boost::asio::io_service io_service_;
@@ -73,27 +71,25 @@ class TCPInterface
 public:
   TCPInterface();
 
-  ~TCPInterface();
-
   // Called to pass in parameters and open ethernet link
-  return_statuses open(std::string ip_address, const int &port);
+  ReturnStatuses open(std::string ip_address, const int &port);
 
   // Close the ethernet link
-  return_statuses close();
+  ReturnStatuses close();
 
   // Check on the status of the link
   bool is_open();
 
   // Read a message
-  return_statuses read(std::vector<uint8_t> *msg,
+  ReturnStatuses read(std::vector<uint8_t> *msg,
                        size_t &bytes_read,
                        int timeout_ms = 0);  // Optional timeout argument, in milliseconds
-  return_statuses read_exactly(std::vector<uint8_t> *msg,
+  ReturnStatuses read_exactly(std::vector<uint8_t> *msg,
                                const size_t &bytes_to_read,
                                int timeout_ms = 0);  // Optional timeout argument, in milliseconds
 
   // Send a message
-  return_statuses write(const std::vector<uint8_t> &msg);
+  ReturnStatuses write(const std::vector<uint8_t> &msg);
 private:
   boost::asio::io_service io_service_;
   boost::asio::ip::tcp::socket socket_;
@@ -105,7 +101,7 @@ private:
 };
 
 // Utility Functions
-std::string return_status_desc(const return_statuses &ret);
+std::string return_status_desc(const ReturnStatuses &ret);
 }  // namespace Network
 }  // namespace AS
 #endif  // NETWORK_INTERFACE_NETWORK_INTERFACE_H
