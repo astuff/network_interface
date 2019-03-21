@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(network_interface)
 
-add_definitions(-std=c++11 -Wall -Wextra -DBUILD_ROS)
+add_definitions(-std=c++11 -Wall -Wextra)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 ## Find catkin macros and libraries
