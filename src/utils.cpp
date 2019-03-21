@@ -6,7 +6,7 @@
 */
 
 #include <string>
-#include <network_interface.h>
+#include <network_interface/network_interface.h>
 
 std::string AS::Network::return_status_desc(const return_statuses &ret)
 {

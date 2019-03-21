@@ -13,6 +13,7 @@
 #include <vector>
 #include <typeinfo>
 #include <cstring>
+#include <type_traits>
 
 namespace AS
 {
@@ -37,15 +38,14 @@ inline bool system_is_big_endian()
 
 // little-endian
 template<typename T>
-T read_le(uint8_t* bufArray,
-          const uint32_t& size,
+T read_le(const std::vector<uint8_t>& bufArray,
           const uint32_t& offset,
           const float& factor,
           const uint32_t& valueOffset)
 {
   uint64_t rcvData = 0;
 
-  for (uint32_t i = size; i > 0; i--)
+  for (uint32_t i = sizeof(T); i > 0; i--)
   {
     rcvData <<= 8;
     // Need to use -1 because array is 0-based
@@ -54,19 +54,23 @@ T read_le(uint8_t* bufArray,
   }
 
   T retVal = 0;
-  std::memcpy(&retVal, (system_is_big_endian()) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
-  retVal *= (T) factor;
+
+  if (system_is_big_endian())
+    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
+  else
+    std::memcpy(&retVal, &rcvData, sizeof(T));
+
+  retVal *= static_cast<T>(factor);
   retVal += valueOffset;
 
   return retVal;
 };
 
 template<typename T>
-T read_le(unsigned char* bufArray,
-          const unsigned int& size,
+T read_le(const std::vector<uint8_t>& bufArray,
           const unsigned int& offset)
 {
-  return read_le<T>(bufArray, size, offset, 1.0, 0);
+  return read_le<T>(bufArray, offset, 1.0, 0);
 };
 
 template<typename T>
@@ -77,14 +81,14 @@ std::vector<uint8_t> write_le(T *source)
   if (sizeof(source))
     return ret_val;
 
-  if (typeid(source) == typeid(float) || typeid(source) == typeid(double) || typeid(source) == typeid(long double))  // NOLINT
+  if (std::is_floating_point<T>::type)
     return ret_val;
 
   T mask = 0xFF;
 
   while ((*source & mask) > 0)
   {
-    ret_val.push_back(uint8_t(*source & mask));
+    ret_val.push_back(static_cast<uint8_t>(*source & mask));
     mask <<= 8;
   }
 
@@ -93,22 +97,26 @@ std::vector<uint8_t> write_le(T *source)
 
 // big-endian
 template<typename T>
-T read_be(unsigned char* bufArray,
-          const unsigned int& size,
+T read_be(const std::vector<uint8_t>& bufArray,
           const unsigned int& offset,
           const float& factor,
           const unsigned int& valueOffset)
 {
   uint64_t rcvData = 0;
 
-  for (unsigned int i = 0; i <  size; i++)
+  for (unsigned int i = 0; i < sizeof(T); i++)
   {
     rcvData <<= 8;
     rcvData |= bufArray[(offset) + i];
   }
 
   T retVal;
-  std::memcpy(&retVal, (system_is_big_endian()) ? &rcvData + sizeof(uint64_t) - sizeof(T) : &rcvData, sizeof(T));
+
+  if (system_is_big_endian())
+    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
+  else
+    std::memcpy(&retVal, &rcvData, sizeof(T));
+
   retVal *= (T) factor;
   retVal += valueOffset;
 
@@ -116,11 +124,10 @@ T read_be(unsigned char* bufArray,
 };
 
 template<typename T>
-T read_be(unsigned char* bufArray,
-          const unsigned int& size,
+T read_be(const std::vector<uint8_t>& bufArray,
           const unsigned int& offset)
 {
-  return read_be<T>(bufArray, size, offset, 1.0, 0);
+  return read_be<T>(bufArray, offset, 1.0, 0);
 }
 
 template<typename T>
@@ -128,7 +135,7 @@ std::vector<uint8_t> write_be(T *source)
 {
   std::vector<uint8_t> ret_val;
 
-  if (typeid(source) == typeid(float) || typeid(source) == typeid(double) || typeid(source) == typeid(long double))  // NOLINT
+  if (std::is_floating_point<T>::type)
   {
     return ret_val;
   }
@@ -141,7 +148,7 @@ std::vector<uint8_t> write_be(T *source)
   while (mask > 0)
   {
     // //printf("mask: 0x%016x\n",mask);
-    ret_val.push_back(uint8_t(((*source) & mask) >> shift));
+    ret_val.push_back(static_cast<uint8_t>((*source & mask) >> shift));
     shift -= 8;
     mask >>= 8;
   }
@@ -149,16 +156,17 @@ std::vector<uint8_t> write_be(T *source)
   return ret_val;
 };
 
-inline int32_t find_magic_word(uint8_t *in, uint32_t buf_size, size_t magic_word)
+inline int32_t find_magic_word(const std::vector<uint8_t>& in, const size_t& magic_word)
 {
   bool packet_found = false;
   uint32_t i = 0;
-  uint32_t chunk;
-  const uint32_t chunk_bytes = 4;
+  uint32_t chunk = 0;
+  auto buf_size = in.size();
 
-  while (!packet_found && buf_size >= chunk_bytes)
+  // Read 4 bytes at a time
+  while (!packet_found && buf_size >= 4)
   {
-    chunk = read_be<uint32_t>(in, chunk_bytes, i);
+    chunk = read_be<uint32_t>(in, i);
 
     if (chunk == magic_word)
     {

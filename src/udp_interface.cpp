@@ -5,7 +5,10 @@
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
-#include <network_interface.h>
+#include <network_interface/network_interface.h>
+
+#include <string>
+#include <vector>
 
 using namespace AS::Network;  // NOLINT
 using boost::asio::ip::udp;
@@ -21,7 +24,7 @@ UDPInterface::~UDPInterface()
 {
 }
 
-return_statuses UDPInterface::open(const char *ip_address, const int &port)
+return_statuses UDPInterface::open(std::string ip_address, const int &port)
 {
   if (socket_.is_open())
     return OK;
@@ -29,7 +32,7 @@ return_statuses UDPInterface::open(const char *ip_address, const int &port)
   std::stringstream sPort;
   sPort << port;
   udp::resolver res(io_service_);
-  udp::resolver::query query(udp::v4(), ip_address, sPort.str());
+  udp::resolver::query query(udp::v4(), ip_address.c_str(), sPort.str());
   sender_endpoint_ = *res.resolve(query);
   boost::system::error_code ec;
 
@@ -73,15 +76,14 @@ bool UDPInterface::is_open()
   return socket_.is_open();
 }
 
-return_statuses UDPInterface::read(unsigned char *msg,
-                                   const size_t &buf_size,
-                                   size_t &bytes_read)
+return_statuses UDPInterface::read(std::vector<uint8_t> *msg, size_t *bytes_read)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  bytes_read = socket_.receive_from(boost::asio::buffer(msg, buf_size), sender_endpoint_, 0, ec);
+  msg->assign(10000, 0);
+  *bytes_read = socket_.receive_from(boost::asio::buffer(*msg), sender_endpoint_, 0, ec);
 
   if (ec.value() == boost::system::errc::success)
   {
@@ -93,13 +95,13 @@ return_statuses UDPInterface::read(unsigned char *msg,
   }
 }
 
-return_statuses UDPInterface::write(unsigned char *msg, const size_t &msg_size)
+return_statuses UDPInterface::write(const std::vector<uint8_t> &msg)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  socket_.send_to(boost::asio::buffer(msg, msg_size), sender_endpoint_, 0, ec);
+  socket_.send_to(boost::asio::buffer(msg), sender_endpoint_, 0, ec);
 
   if (ec.value() == boost::system::errc::success)
   {

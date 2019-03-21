@@ -5,7 +5,10 @@
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
-#include <network_interface.h>
+#include <network_interface/network_interface.h>
+
+#include <string>
+#include <vector>
 
 using namespace AS::Network;  // NOLINT
 using boost::asio::ip::tcp;
@@ -21,7 +24,7 @@ TCPInterface::~TCPInterface()
 {
 }
 
-return_statuses TCPInterface::open(const char *ip_address, const int &port)
+return_statuses TCPInterface::open(std::string ip_address, const int &port)
 {
   if (socket_.is_open())
     return OK;
@@ -87,8 +90,7 @@ void TCPInterface::read_handler(const boost::system::error_code& error, size_t b
   bytes_read_ = bytes_read;
 }
 
-return_statuses TCPInterface::read(unsigned char *msg,
-                                   const size_t &buf_size,
+return_statuses TCPInterface::read(std::vector<uint8_t> *msg,
                                    size_t &bytes_read,
                                    int timeout_ms)
 {
@@ -107,8 +109,9 @@ return_statuses TCPInterface::read(unsigned char *msg,
                                  boost::asio::placeholders::error));
   }
 
+  msg->assign(10000, 0);
   boost::asio::async_read(socket_,
-                          boost::asio::buffer(msg, buf_size),
+                          boost::asio::buffer(*msg),
                           boost::bind(&TCPInterface::read_handler,
                                       this,
                                       boost::asio::placeholders::error,
@@ -143,10 +146,7 @@ return_statuses TCPInterface::read(unsigned char *msg,
   }
 }
 
-return_statuses TCPInterface::read_exactly(unsigned char *msg,
-    const size_t &buf_size,
-    const size_t &bytes_to_read,
-    int timeout_ms)
+return_statuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size_t &bytes_to_read, int timeout_ms)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
@@ -164,7 +164,7 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
   }
 
   boost::asio::async_read(socket_,
-                          boost::asio::buffer(msg, buf_size),
+                          boost::asio::buffer(*msg),
                           boost::asio::transfer_exactly(bytes_to_read),
                           boost::bind(&TCPInterface::read_handler,
                                       this,
@@ -199,13 +199,13 @@ return_statuses TCPInterface::read_exactly(unsigned char *msg,
   }
 }
 
-return_statuses TCPInterface::write(unsigned char *msg, const size_t &msg_size)
+return_statuses TCPInterface::write(const std::vector<uint8_t> &msg)
 {
   if (!socket_.is_open())
     return SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  boost::asio::write(socket_, boost::asio::buffer(msg, msg_size), ec);
+  boost::asio::write(socket_, boost::asio::buffer(msg), ec);
 
   if (ec.value() == boost::system::errc::success)
   {
