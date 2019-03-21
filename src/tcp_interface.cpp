@@ -154,6 +154,7 @@ ReturnStatuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size_
                                  boost::asio::placeholders::error));
   }
 
+  msg->reserve(bytes_to_read);
   boost::asio::async_read(socket_,
                           boost::asio::buffer(*msg),
                           boost::asio::transfer_exactly(bytes_to_read),
