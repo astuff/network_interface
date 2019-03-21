@@ -11,6 +11,8 @@
 #ifndef NETWORK_INTERFACE_NETWORK_INTERFACE_H
 #define NETWORK_INTERFACE_NETWORK_INTERFACE_H
 
+#include "network_interface/common.h"
+
 // C++ Includes
 #include <cstdio>
 #include <iostream>
@@ -26,19 +28,6 @@ namespace AS
 {
 namespace Network
 {
-enum class ReturnStatuses
-{
-  OK = 0,
-  INIT_FAILED = -1,
-  BAD_PARAM = -2,
-  SOCKET_ERROR = -3,
-  SOCKET_CLOSED = -4,
-  NO_MESSAGES_RECEIVED = -5,
-  READ_FAILED = -6,
-  WRITE_FAILED = -7,
-  CLOSE_FAILED = -8,
-  SOCKET_TIMEOUT = -9
-};
 
 class UDPInterface
 {
