@@ -27,7 +27,7 @@ enum class ReturnStatuses
   SOCKET_TIMEOUT = -9
 };
 
-enum ByteOrder
+enum class ByteOrder
 {
   BE = 0,
   LE
