@@ -14,7 +14,7 @@
 #include <vector>
 #include <typeinfo>
 #include <string>
-#include <algorithm>
+#include <cstring>
 #include <type_traits>
 
 namespace AS
@@ -53,9 +53,9 @@ T read_le(const std::vector<uint8_t>& bufArray,
   T retVal = 0;
 
   if (system_is_big_endian())
-    std::copy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
+    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
   else
-    std::copy(&retVal, &rcvData, sizeof(T));
+    std::memcpy(&retVal, &rcvData, sizeof(T));
 
   retVal *= static_cast<T>(factor);
   retVal += valueOffset;
@@ -110,9 +110,9 @@ T read_be(const std::vector<uint8_t>& bufArray,
   T retVal;
 
   if (system_is_big_endian())
-    std::copy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
+    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
   else
-    std::copy(&retVal, &rcvData, sizeof(T));
+    std::memcpy(&retVal, &rcvData, sizeof(T));
 
   retVal *= (T) factor;
   retVal += valueOffset;
