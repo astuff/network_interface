@@ -44,7 +44,7 @@ public:
   bool is_open();
 
   // Read a message - UDP is datagram-based so you cannot read exactly x bytes.
-  ReturnStatuses read(std::vector<uint8_t> *msg, size_t *bytes_read);
+  ReturnStatuses read(std::vector<uint8_t> *msg);
 
   // Send a message
   ReturnStatuses write(const std::vector<uint8_t>& msg);
@@ -70,12 +70,8 @@ public:
   bool is_open();
 
   // Read a message
-  ReturnStatuses read(std::vector<uint8_t> *msg,
-                       size_t &bytes_read,
-                       int timeout_ms = 0);  // Optional timeout argument, in milliseconds
-  ReturnStatuses read_exactly(std::vector<uint8_t> *msg,
-                               const size_t &bytes_to_read,
-                               int timeout_ms = 0);  // Optional timeout argument, in milliseconds
+  ReturnStatuses read(std::vector<uint8_t> *msg);
+  ReturnStatuses read_exactly(std::vector<uint8_t> *msg, const size_t &bytes_to_read);
 
   // Send a message
   ReturnStatuses write(const std::vector<uint8_t> &msg);
@@ -83,10 +79,6 @@ private:
   boost::asio::io_service io_service_;
   boost::asio::ip::tcp::socket socket_;
   boost::system::error_code error_;
-  size_t bytes_read_;
-
-  void timeout_handler(const boost::system::error_code& error);
-  void read_handler(const boost::system::error_code& error, size_t bytes_read);
 };
 
 // Utility Functions

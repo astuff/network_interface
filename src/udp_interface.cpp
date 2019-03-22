@@ -67,14 +67,14 @@ bool UDPInterface::is_open()
   return socket_.is_open();
 }
 
-ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg, size_t *bytes_read)
+ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg)
 {
   if (!socket_.is_open())
     return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  msg->assign(10000, 0);
-  *bytes_read = socket_.receive_from(boost::asio::buffer(*msg), sender_endpoint_, 0, ec);
+  msg->reserve(10000);
+  socket_.receive(boost::asio::buffer(*msg), 0, ec);
 
   if (ec.value() == boost::system::errc::success)
     return ReturnStatuses::OK;
