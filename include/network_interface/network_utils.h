@@ -75,9 +75,6 @@ std::vector<uint8_t> write_le(T *source)
 {
   std::vector<uint8_t> ret_val;
 
-  if (sizeof(source))
-    return ret_val;
-
   if (std::is_floating_point<T>::type)
     return ret_val;
 
@@ -133,9 +130,7 @@ std::vector<uint8_t> write_be(T *source)
   std::vector<uint8_t> ret_val;
 
   if (std::is_floating_point<T>::type)
-  {
     return ret_val;
-  }
 
   T mask = 0xFF;
 
