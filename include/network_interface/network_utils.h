@@ -22,17 +22,6 @@ namespace AS
 namespace Network
 {
 
-inline bool system_is_big_endian()
-{
-  union
-  {
-    uint32_t i;
-    char c[4];
-  } big_int = {0x12345678};
-
-  return big_int.c[0] == 1;
-}
-
 // little-endian
 template<typename T>
 T read_le(const std::vector<uint8_t>& bufArray,
@@ -50,17 +39,13 @@ T read_le(const std::vector<uint8_t>& bufArray,
     rcvData |= bufArray[(offset - 1) + i];
   }
 
-  T retVal = 0;
+  T* retVal;
 
-  if (system_is_big_endian())
-    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
-  else
-    std::memcpy(&retVal, &rcvData, sizeof(T));
+  retVal = reinterpret_cast<T*>(&rcvData);
+  *retVal *= static_cast<T>(factor);
+  *retVal += valueOffset;
 
-  retVal *= static_cast<T>(factor);
-  retVal += valueOffset;
-
-  return retVal;
+  return *retVal;
 };
 
 template<typename T>
@@ -104,17 +89,13 @@ T read_be(const std::vector<uint8_t>& bufArray,
     rcvData |= bufArray[(offset) + i];
   }
 
-  T retVal;
+  T* retVal;
 
-  if (system_is_big_endian())
-    std::memcpy(&retVal, &rcvData + sizeof(uint64_t) - sizeof(T), sizeof(T));
-  else
-    std::memcpy(&retVal, &rcvData, sizeof(T));
+  retVal = reinterpret_cast<T*>(&rcvData);
+  *retVal *= static_cast<T>(factor);
+  *retVal += valueOffset;
 
-  retVal *= (T) factor;
-  retVal += valueOffset;
-
-  return retVal;
+  return *retVal;
 };
 
 template<typename T>
