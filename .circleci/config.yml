@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Install QEMU on Machine
           command: |
-            apt update -qq && apt install -y dpkg qemu-user-static
+            sudo apt update -qq && sudo apt install -y dpkg qemu-user-static
       - run:
           name: Clone and Run AS Docker Image
           command: |
