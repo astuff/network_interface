@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Install QEMU on Machine
           command: |
-            sudo apt update -qq && sudo apt install -y dpkg qemu-user-static
+            sudo apt-get update -qq && sudo apt-get install -y dpkg qemu-user-static
       - run:
           name: Clone and Run AS Docker Image
           command: |
@@ -91,31 +91,37 @@ jobs:
     working_directory: ~/src
 
   melodic_armhf:
-    docker:
-      - image: autonomoustuff/docker-builds:melodic-ros-base
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
     steps:
       - checkout
       - run:
-          name: Set Up Container
+          name: Install QEMU on Machine
           command: |
-            apt-get update -qq
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
+            sudo apt-get update -qq && sudo apt-get install -y dpkg qemu-user-static
       - run:
-          name: Build
+          name: Clone and Run AS Docker Image
           command: |
-            cd ..
-            catkin build
+            docker pull autonomoustuff/docker-builds:melodic-ros-base
+            docker run -d --name test -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:melodic-ros-base sh -c "sleep infinity"
       - run:
-          name: Run Tests
+          name: Set Up ROS in Docker
           command: |
-            source /opt/ros/melodic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
+      - run:
+          name: Build in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
+      - run:
+          name: Run Tests in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
+      - run:
+          name: Shut Down Container
+          command: |
+            docker kill $(docker ps -l -q)
     working_directory: ~/src
 
 workflows:
@@ -125,4 +131,4 @@ workflows:
       - kinetic_x86
       - melodic_x86
       - kinetic_armhf
-      # melodic_armhf
+      - melodic_armhf
