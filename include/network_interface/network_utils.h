@@ -60,7 +60,7 @@ std::vector<uint8_t> write_le(T *source)
 {
   std::vector<uint8_t> ret_val;
 
-  if (std::is_floating_point<T>::type)
+  if (std::is_floating_point<T>::value)
     return ret_val;
 
   T mask = 0xFF;
@@ -110,7 +110,7 @@ std::vector<uint8_t> write_be(T *source)
 {
   std::vector<uint8_t> ret_val;
 
-  if (std::is_floating_point<T>::type)
+  if (std::is_floating_point<T>::value)
     return ret_val;
 
   T mask = 0xFF;
