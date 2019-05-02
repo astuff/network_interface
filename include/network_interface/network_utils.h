@@ -50,7 +50,7 @@ T read_le(const std::vector<uint8_t>& bufArray,
 
 template<typename T>
 T read_le(const std::vector<uint8_t>& bufArray,
-          const unsigned int& offset)
+          const uint32_t& offset)
 {
   return read_le<T>(bufArray, offset, 1.0, 0);
 };
@@ -77,13 +77,13 @@ std::vector<uint8_t> write_le(T *source)
 // big-endian
 template<typename T>
 T read_be(const std::vector<uint8_t>& bufArray,
-          const unsigned int& offset,
+          const uint32_t& offset,
           const float& factor,
-          const unsigned int& valueOffset)
+          const uint32_t& valueOffset)
 {
   uint64_t rcvData = 0;
 
-  for (unsigned int i = 0; i < sizeof(T); i++)
+  for (uint32_t i = 0; i < sizeof(T); i++)
   {
     rcvData <<= 8;
     rcvData |= bufArray[(offset) + i];
@@ -100,7 +100,7 @@ T read_be(const std::vector<uint8_t>& bufArray,
 
 template<typename T>
 T read_be(const std::vector<uint8_t>& bufArray,
-          const unsigned int& offset)
+          const uint32_t& offset)
 {
   return read_be<T>(bufArray, offset, 1.0, 0);
 }
