@@ -41,6 +41,7 @@ T read_le(const std::vector<uint8_t>& bufArray,
 
   T* retVal;
 
+  // Reinterpret the uint64_t as the provided type
   retVal = reinterpret_cast<T*>(&rcvData);
   *retVal *= static_cast<T>(factor);
   *retVal += static_cast<T>(valueOffset);
@@ -52,6 +53,8 @@ template<typename T>
 T read_le(const std::vector<uint8_t>& bufArray,
           const uint32_t& offset)
 {
+  // Call the other signature of this function
+  // with a factor of 1.0 and an offset of 0.
   return read_le<T>(bufArray, offset, 1.0, 0);
 };
 
@@ -64,6 +67,9 @@ std::vector<uint8_t> write_le(T *source,
   T mask = 0xFF;
   uint32_t shift = 0;
 
+  // Shift is the bitshift value to apply.
+  // It starts at 0 and increments by 8 bits
+  // for each byte.
   while (shift < (8 * sizeof(T)))
   {
     ret_val.push_back(static_cast<uint8_t>((*source & mask) >> shift));
@@ -78,6 +84,11 @@ template<typename T>
 std::vector<uint8_t> write_le(T *source,
     typename std::enable_if<std::is_floating_point<T>::value>::type* = 0)
 {
+  // This function handles floating-point values
+  // by finding an unsigned int of the same size
+  // and casting the raw bits of the floating-point
+  // value to an unsigned int, then calling this
+  // function recursively with that value.
   if (sizeof(T) == sizeof(uint16_t))
   {
     return write_le<uint16_t>(
@@ -110,11 +121,14 @@ T read_be(const std::vector<uint8_t>& bufArray,
   for (uint32_t i = 0; i < sizeof(T); i++)
   {
     rcvData <<= 8;
+    // Since we're counting up from 0 to size(T)
+    // we don't need the -1 here.
     rcvData |= bufArray[(offset) + i];
   }
 
   T* retVal;
 
+  // Reinterpret the uint64_t as the provided type
   retVal = reinterpret_cast<T*>(&rcvData);
   *retVal *= static_cast<T>(factor);
   *retVal += static_cast<T>(valueOffset);
@@ -126,6 +140,8 @@ template<typename T>
 T read_be(const std::vector<uint8_t>& bufArray,
           const uint32_t& offset)
 {
+  // Call the other signature of this function
+  // with a factor of 1.0 and an offset of 0.
   return read_be<T>(bufArray, offset, 1.0, 0);
 }
 
@@ -140,6 +156,9 @@ std::vector<uint8_t> write_be(T *source,
   int shift = 8 * (sizeof(T) - 1);
   mask <<= shift;
 
+  // Shift is the bitshift value to apply.
+  // It starts at 8 * number of bytes of T - 1
+  // and decrements by 8 bits for each byte.
   while (mask > 0)
   {
     ret_val.push_back(static_cast<uint8_t>((*source & mask) >> shift));
@@ -154,6 +173,11 @@ template<class T>
 std::vector<uint8_t> write_be(T *source,
     typename std::enable_if<std::is_floating_point<T>::value>::type* = 0)
 {
+  // This function handles floating-point values
+  // by finding an unsigned int of the same size
+  // and casting the raw bits of the floating-point
+  // value to an unsigned int, then calling this
+  // function recursively with that value.
   if (sizeof(T) == sizeof(uint16_t))
   {
     return write_be(
