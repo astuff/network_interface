@@ -81,8 +81,6 @@ private:
   boost::system::error_code error_;
 };
 
-// Utility Functions
-std::string return_status_desc(const ReturnStatuses &ret);
 }  // namespace Network
 }  // namespace AS
 #endif  // NETWORK_INTERFACE_NETWORK_INTERFACE_H

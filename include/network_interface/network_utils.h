@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <deque>
 #include <typeinfo>
 #include <string>
 #include <cstring>
@@ -23,8 +24,8 @@ namespace Network
 {
 
 // little-endian
-template<typename T>
-T read_le(const std::vector<uint8_t>& bufArray,
+template<class T, class C>
+T read_le(const C& bufArray,
           const uint32_t& offset,
           const float& factor,
           const float& valueOffset)
@@ -49,8 +50,8 @@ T read_le(const std::vector<uint8_t>& bufArray,
   return *retVal;
 };
 
-template<typename T>
-T read_le(const std::vector<uint8_t>& bufArray,
+template<class T, class C>
+T read_le(const C& bufArray,
           const uint32_t& offset)
 {
   // Call the other signature of this function
@@ -58,7 +59,7 @@ T read_le(const std::vector<uint8_t>& bufArray,
   return read_le<T>(bufArray, offset, 1.0, 0);
 };
 
-template<typename T>
+template<class T>
 std::vector<uint8_t> write_le(T *source,
     typename std::enable_if<std::is_integral<T>::value>::type* = 0)
 {
@@ -80,7 +81,7 @@ std::vector<uint8_t> write_le(T *source,
   return ret_val;
 };
 
-template<typename T>
+template<class T>
 std::vector<uint8_t> write_le(T *source,
     typename std::enable_if<std::is_floating_point<T>::value>::type* = 0)
 {
@@ -110,8 +111,8 @@ std::vector<uint8_t> write_le(T *source,
 };
 
 // big-endian
-template<typename T>
-T read_be(const std::vector<uint8_t>& bufArray,
+template<class T, class C>
+T read_be(const C& bufArray,
           const uint32_t& offset,
           const float& factor,
           const float& valueOffset)
@@ -136,8 +137,8 @@ T read_be(const std::vector<uint8_t>& bufArray,
   return *retVal;
 };
 
-template<typename T>
-T read_be(const std::vector<uint8_t>& bufArray,
+template<class T, class C>
+T read_be(const C& bufArray,
           const uint32_t& offset)
 {
   // Call the other signature of this function
@@ -198,7 +199,8 @@ std::vector<uint8_t> write_be(T *source,
   }
 }
 
-inline int32_t find_magic_word(const std::vector<uint8_t>& in, const size_t& magic_word)
+template<typename C>
+inline int32_t find_magic_word(const C& in, const size_t& magic_word)
 {
   bool packet_found = false;
   uint32_t i = 0;
