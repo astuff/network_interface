@@ -226,6 +226,21 @@ inline int32_t find_magic_word(const C& in, const size_t& magic_word)
   return -1;
 };
 
+template<class T, class C>
+void parse_tuple(const C& in, T *out1, T *out2, ByteOrder bo)
+{
+  if (bo == ByteOrder::LE)
+  {
+    *out1 = read_le<T>(in, 0);
+    *out2 = read_le<T>(in, sizeof(T));
+  }
+  else if (bo == ByteOrder::BE)
+  {
+    *out1 = read_be<T>(in, 0);
+    *out2 = read_be<T>(in, sizeof(T));
+  }
+};
+
 std::string return_status_desc(const ReturnStatuses &ret)
 {
   if (ret == ReturnStatuses::INIT_FAILED)
