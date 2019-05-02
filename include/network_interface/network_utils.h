@@ -27,7 +27,7 @@ template<typename T>
 T read_le(const std::vector<uint8_t>& bufArray,
           const uint32_t& offset,
           const float& factor,
-          const uint32_t& valueOffset)
+          const float& valueOffset)
 {
   uint64_t rcvData = 0;
 
@@ -43,7 +43,7 @@ T read_le(const std::vector<uint8_t>& bufArray,
 
   retVal = reinterpret_cast<T*>(&rcvData);
   *retVal *= static_cast<T>(factor);
-  *retVal += valueOffset;
+  *retVal += static_cast<T>(valueOffset);
 
   return *retVal;
 };
@@ -79,7 +79,7 @@ template<typename T>
 T read_be(const std::vector<uint8_t>& bufArray,
           const uint32_t& offset,
           const float& factor,
-          const uint32_t& valueOffset)
+          const float& valueOffset)
 {
   uint64_t rcvData = 0;
 
@@ -93,7 +93,7 @@ T read_be(const std::vector<uint8_t>& bufArray,
 
   retVal = reinterpret_cast<T*>(&rcvData);
   *retVal *= static_cast<T>(factor);
-  *retVal += valueOffset;
+  *retVal += static_cast<T>(valueOffset);
 
   return *retVal;
 };
