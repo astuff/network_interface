@@ -56,22 +56,46 @@ T read_le(const std::vector<uint8_t>& bufArray,
 };
 
 template<typename T>
-std::vector<uint8_t> write_le(T *source)
+std::vector<uint8_t> write_le(T *source,
+    typename std::enable_if<std::is_integral<T>::value>::type* = 0)
 {
   std::vector<uint8_t> ret_val;
 
-  if (std::is_floating_point<T>::value)
-    return ret_val;
-
   T mask = 0xFF;
+  uint32_t shift = 0;
 
-  while ((*source & mask) > 0)
+  while (shift < (8 * sizeof(T)))
   {
-    ret_val.push_back(static_cast<uint8_t>(*source & mask));
+    ret_val.push_back(static_cast<uint8_t>((*source & mask) >> shift));
+    shift += 8;
     mask <<= 8;
   }
 
   return ret_val;
+};
+
+template<typename T>
+std::vector<uint8_t> write_le(T *source,
+    typename std::enable_if<std::is_floating_point<T>::value>::type* = 0)
+{
+  if (sizeof(T) == sizeof(uint16_t))
+  {
+    return write_le<uint16_t>(
+      static_cast<uint16_t*>(
+        static_cast<void*>(source)));
+  }
+  else if (sizeof(T) == sizeof(uint32_t))
+  {
+    return write_le<uint32_t>(
+      static_cast<uint32_t*>(
+        static_cast<void*>(source)));
+  }
+  else if (sizeof(T) == sizeof(uint64_t))
+  {
+    return write_le<uint64_t>(
+      static_cast<uint64_t*>(
+        static_cast<void*>(source)));
+  }
 };
 
 // big-endian
@@ -105,13 +129,11 @@ T read_be(const std::vector<uint8_t>& bufArray,
   return read_be<T>(bufArray, offset, 1.0, 0);
 }
 
-template<typename T>
-std::vector<uint8_t> write_be(T *source)
+template<class T>
+std::vector<uint8_t> write_be(T *source,
+    typename std::enable_if<std::is_integral<T>::value>::type* = 0)
 {
   std::vector<uint8_t> ret_val;
-
-  if (std::is_floating_point<T>::value)
-    return ret_val;
 
   T mask = 0xFF;
 
@@ -120,7 +142,6 @@ std::vector<uint8_t> write_be(T *source)
 
   while (mask > 0)
   {
-    // //printf("mask: 0x%016x\n",mask);
     ret_val.push_back(static_cast<uint8_t>((*source & mask) >> shift));
     shift -= 8;
     mask >>= 8;
@@ -128,6 +149,30 @@ std::vector<uint8_t> write_be(T *source)
 
   return ret_val;
 };
+
+template<class T>
+std::vector<uint8_t> write_be(T *source,
+    typename std::enable_if<std::is_floating_point<T>::value>::type* = 0)
+{
+  if (sizeof(T) == sizeof(uint16_t))
+  {
+    return write_be(
+      static_cast<uint16_t*>(
+        static_cast<void*>(source)));
+  }
+  else if (sizeof(T) == sizeof(uint32_t))
+  {
+    return write_be(
+      static_cast<uint32_t*>(
+        static_cast<void*>(source)));
+  }
+  else if (sizeof(T) == sizeof(uint64_t))
+  {
+    return write_be(
+      static_cast<uint64_t*>(
+        static_cast<void*>(source)));
+  }
+}
 
 inline int32_t find_magic_word(const std::vector<uint8_t>& in, const size_t& magic_word)
 {
