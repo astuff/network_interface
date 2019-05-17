@@ -5,50 +5,88 @@
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
-#include <network_utils.h>
+#include <network_interface/network_utils.h>
 #include <gtest/gtest.h>
-#include <stdio.h>
 
-TEST(TCPInterface, testReadBEFloat)
+#include <vector>
+
+class NetworkUtilsTest
+: public :: testing::Test
 {
-  // 123.4567 as binary float
-  uint8_t bytes[4] = { 0x42, 0xF6, 0xE9, 0xD5};
-  ASSERT_EQ(123.45670318603515625, AS::Network::read_be<float>(bytes, 4, 0));
+  protected:
+    float test_float = 123.45670318603515625;
+    double test_double = 123.4567;
+    uint32_t test_int = 1234567891;
+    std::vector<uint8_t> float_be_bytes = {0x42, 0xF6, 0xE9, 0xD5};
+    std::vector<uint8_t> float_le_bytes = {0xD5, 0xE9, 0xF6, 0x42};
+    std::vector<uint8_t> double_be_bytes = {0x40, 0x5E, 0xDD, 0x3A, 0x92, 0xA3, 0x05, 0x53};
+    std::vector<uint8_t> double_le_bytes = {0x53, 0x05, 0xA3, 0x92, 0x3A, 0xDD, 0x5E, 0x40};
+    std::vector<uint8_t> int_be_bytes = {0x49, 0x96, 0x02, 0xD3};
+    std::vector<uint8_t> int_le_bytes = {0xD3, 0x02, 0x96, 0x49};
+};
+
+// Read tests
+
+TEST_F(NetworkUtilsTest, testReadBEFloat)
+{
+  ASSERT_EQ(test_float, AS::Network::read_be<float>(float_be_bytes, 0));
 }
 
-TEST(TCPInterface, testReadBEDouble)
+TEST_F(NetworkUtilsTest, testReadBEDouble)
 {
-  // 123.4567 as binary double
-  uint8_t bytes[8] = { 0x40, 0x5E, 0xDD, 0x3A, 0x92, 0xA3, 0x05, 0x53};
-  ASSERT_EQ(123.4567, AS::Network::read_be<double>(bytes, 8, 0));
+  ASSERT_EQ(test_double, AS::Network::read_be<double>(double_be_bytes, 0));
 }
 
-TEST(TCPInterface, testReadBEInt)
+TEST_F(NetworkUtilsTest, testReadBEInt)
 {
-  // 888888888 as  hex Int
-  uint8_t bytes[4] = { 0x34, 0xFB, 0x5E, 0x38};
-  ASSERT_EQ(888888888, AS::Network::read_be<uint32_t>(bytes, 4, 0));
+  ASSERT_EQ(test_int, AS::Network::read_be<uint32_t>(int_be_bytes, 0));
 }
 
-TEST(TCPInterface, testReadLEFloat)
+TEST_F(NetworkUtilsTest, testReadLEFloat)
 {
-  // 123.4567 as binary float
-  uint8_t bytes[4] = { 0xD5, 0xE9, 0xF6, 0x42};
-  ASSERT_EQ(123.45670318603515625, AS::Network::read_le<float>(bytes, 4, 0));
+  ASSERT_EQ(test_float, AS::Network::read_le<float>(float_le_bytes, 0));
 }
 
-TEST(TCPInterface, testReadLEDouble)
+TEST_F(NetworkUtilsTest, testReadLEDouble)
 {
-  // 123.4567 as binary double
-  uint8_t bytes[8] = { 0x53, 0x05, 0xA3, 0x92, 0x3A, 0xDD, 0x5E, 0x40};
-  ASSERT_EQ(123.4567, AS::Network::read_le<double>(bytes, 8, 0));
+  ASSERT_EQ(test_double, AS::Network::read_le<double>(double_le_bytes, 0));
 }
 
-TEST(TCPInterface, testReadLEInt)
+TEST_F(NetworkUtilsTest, testReadLEInt)
 {
-  // 1234567891 as  hex Int
-  uint8_t bytes[4] = { 0xD3, 0x02, 0x96, 0x49};
-  ASSERT_EQ(1234567891, AS::Network::read_le<uint32_t>(bytes, 4, 0));
+  ASSERT_EQ(test_int, AS::Network::read_le<uint32_t>(int_le_bytes, 0));
+}
+
+// Write tests
+
+TEST_F(NetworkUtilsTest, testWriteBEFloat)
+{
+  ASSERT_EQ(float_be_bytes, AS::Network::write_be(&test_float));
+}
+
+TEST_F(NetworkUtilsTest, testWriteBEDouble)
+{
+  ASSERT_EQ(double_be_bytes, AS::Network::write_be(&test_double));
+}
+
+TEST_F(NetworkUtilsTest, testWriteBEInt)
+{
+  ASSERT_EQ(int_be_bytes, AS::Network::write_be(&test_int));
+}
+
+TEST_F(NetworkUtilsTest, testWriteLEFloat)
+{
+  ASSERT_EQ(float_le_bytes, AS::Network::write_le(&test_float));
+}
+
+TEST_F(NetworkUtilsTest, testWriteLEDouble)
+{
+  ASSERT_EQ(double_le_bytes, AS::Network::write_le(&test_double));
+}
+
+TEST_F(NetworkUtilsTest, testWriteLEInt)
+{
+  ASSERT_EQ(int_le_bytes, AS::Network::write_le(&test_int));
 }
 
 int main(int argc, char **argv)
