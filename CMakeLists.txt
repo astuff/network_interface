@@ -41,21 +41,13 @@ add_library(
   ${PROJECT_NAME}
   src/tcp_interface.cpp
   src/udp_interface.cpp
+  src/utils.cpp
 )
 
 target_link_libraries(
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
-
-roslint_cpp()
-
-if(CATKIN_ENABLE_TESTING)
-  roslint_add_test()
-
-  catkin_add_gtest(${PROJECT_NAME}_tests test/network_interface_test.cpp)
-  target_link_libraries(${PROJECT_NAME}_tests ${catkin_LIBRARIES})
-endif()
 
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -66,3 +58,12 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY include
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
+
+roslint_cpp()
+
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+
+  catkin_add_gtest(${PROJECT_NAME}_tests test/network_interface_test.cpp)
+  target_link_libraries(${PROJECT_NAME}_tests ${catkin_LIBRARIES})
+endif()
