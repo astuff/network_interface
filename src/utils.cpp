@@ -1,3 +1,10 @@
+/*
+* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+*
+* This file is part of the network_interface ROS driver which is released under the MIT license.
+* See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
+*/
+
 #include <network_interface/network_interface.h>
 #include <string>
 
