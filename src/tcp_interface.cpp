@@ -74,7 +74,7 @@ ReturnStatuses TCPInterface::read(std::vector<uint8_t> *msg)
 
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
-  msg->reserve(10000);
+  msg->resize(socket_.available(), 0);
   boost::asio::read(socket_, boost::asio::buffer(*msg), error_);
 
   // Reset the io service so that it is available for the next call to TCPInterface::read
@@ -93,7 +93,7 @@ ReturnStatuses TCPInterface::read_exactly(std::vector<uint8_t> *msg, const size_
 
   error_.assign(boost::system::errc::success, boost::system::system_category());
 
-  msg->reserve(bytes_to_read);
+  msg->resize(bytes_to_read, 0);
   boost::asio::read(socket_, boost::asio::buffer(*msg), boost::asio::transfer_exactly(bytes_to_read));
 
   // Reset the io service so that it is available for the next call to TCPInterface::read_exactly
