@@ -73,7 +73,7 @@ ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg)
     return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  msg->reserve(10000);
+  msg->resize(socket_.available(), 0);
   socket_.receive(boost::asio::buffer(*msg), 0, ec);
 
   if (ec.value() == boost::system::errc::success)
