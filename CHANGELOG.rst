@@ -2,7 +2,7 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.0 (2021-02-26)
+3.0.0 (2021-03-03)
 ------------------
 * Add noetic CI builds (`#31 <https://github.com/astuff/network_interface/issues/31>`_)
 * Disable docker layer caching (`#30 <https://github.com/astuff/network_interface/issues/30>`_)
