@@ -4,6 +4,8 @@ Changelog for package network_interface
 
 3.0.0 (2021-02-26)
 ------------------
+* Add noetic CI builds (`#31 <https://github.com/astuff/network_interface/issues/31>`_)
+* Disable docker layer caching (`#30 <https://github.com/astuff/network_interface/issues/30>`_)
 * Merge pull request `#26 <https://github.com/astuff/network_interface/issues/26>`_ from astuff/fix/memory_allocation
   Fix memory initialization of buffer vector.
 * Apply same buffer allocation fix to UDP interface.
@@ -51,7 +53,7 @@ Changelog for package network_interface
 * Merge pull request `#18 <https://github.com/astuff/network_interface/issues/18>`_ from astuff/maint/ci_new_docker_images
   CI: Using AS Docker images.
 * CI: Using AS Docker images.
-* Contributors: Joshua Whitley, Rinda Gunjala, Sam Rustan, Zach Oakes
+* Contributors: Ian Colwell, Joshua Whitley, Rinda Gunjala, Sam Rustan, Zach Oakes
 
 2.1.0 (2018-08-30)
 ------------------
