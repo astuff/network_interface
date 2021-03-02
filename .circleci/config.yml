@@ -31,7 +31,6 @@ jobs:
   kinetic_armhf:
     machine:
       image: circleci/classic:latest
-      docker_layer_caching: true
     steps:
       - checkout
       - run:
@@ -93,7 +92,6 @@ jobs:
   melodic_armhf:
     machine:
       image: circleci/classic:latest
-      docker_layer_caching: true
     steps:
       - checkout
       - run:
