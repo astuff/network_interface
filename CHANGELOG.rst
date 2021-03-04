@@ -2,6 +2,59 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2021-03-03)
+------------------
+* Add noetic CI builds (`#31 <https://github.com/astuff/network_interface/issues/31>`_)
+* Disable docker layer caching (`#30 <https://github.com/astuff/network_interface/issues/30>`_)
+* Merge pull request `#26 <https://github.com/astuff/network_interface/issues/26>`_ from astuff/fix/memory_allocation
+  Fix memory initialization of buffer vector.
+* Apply same buffer allocation fix to UDP interface.
+* Fix memory initialization of buffer vector.
+* Adding copyright to utils.cpp.
+* Moving definition of return_status_desc to fix linking bug.
+* Merge pull request `#25 <https://github.com/astuff/network_interface/issues/25>`_ from astuff/maint/cpp_11_cleanup
+  Maint/cpp 11 cleanup
+* Had to add offset to parse_tuple.
+* Moving parse_tuple from ibeo_core.
+* Allowing read functions to take multiple containers.
+* Commenting code.
+* New implementation of write_le and write_be. Tests for both.
+* Changing valueOffset to float and casting in util functions.
+* Replacing unsigned int with uint32_t.
+* Used wrong type-trait qualifier.
+* CI: Adding Melodic armhf build.
+* CI: Machine executors require sudo.
+* CI: Add first run at armhf build.
+* Changing to reinterpret_cast instead of non-portable solution.
+* Removing async calls from TCP. Allocating buffers with reserve.
+* Removing apparently useless check in write_le.
+* Consistent braced initializers.
+* -DBUILD_ROS is no longer a thing.
+* Reserving requested space in read_exactly.
+* Making ByteOrder enum scoped too.
+* Switching back to memcpy.
+* Moving common enums into common.h.
+* Scoped enum for return statuses.
+* Using vectors and type traits.
+* CI: Making roslint run in run_tests.
+* Merge pull request `#20 <https://github.com/astuff/network_interface/issues/20>`_ from astuff/maint/ci_add_lint
+  Maint/ci add lint
+* CI: Adding catkin_test_results the right way.
+* CI: Adding catkin_test_results.
+* Making lint cover all files and adding copyright.
+* CI: Need --no-deps for lint.
+* CI: Oops.
+* CI: Adding roslint to build tests.
+* Removing unused gitlabci file.
+* CI: Removing Indigo build.
+* Merge pull request `#19 <https://github.com/astuff/network_interface/issues/19>`_ from astuff/maint/add_urls
+  Adding website URL to package.xml.
+* Adding website URL to package.xml.
+* Merge pull request `#18 <https://github.com/astuff/network_interface/issues/18>`_ from astuff/maint/ci_new_docker_images
+  CI: Using AS Docker images.
+* CI: Using AS Docker images.
+* Contributors: Ian Colwell, Joshua Whitley, Rinda Gunjala, Sam Rustan, Zach Oakes
+
 2.1.0 (2018-08-30)
 ------------------
 * Merge pull request `#13 <https://github.com/astuff/network_interface/issues/13>`_ from astuff/maint/remove_unused_variables_in_test
