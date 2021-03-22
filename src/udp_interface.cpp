@@ -19,6 +19,12 @@ UDPInterface::UDPInterface() :
 {
 }
 
+ReturnStatuses UDPInterface::open(std::string ip_address, const int &port, uint receive_buffer_size)
+{
+  receive_buffer_size_ = receive_buffer_size;
+  return UDPInterface::open(ip_address, port);
+}
+
 ReturnStatuses UDPInterface::open(std::string ip_address, const int &port)
 {
   if (socket_.is_open())
@@ -73,8 +79,9 @@ ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg)
     return ReturnStatuses::SOCKET_CLOSED;
 
   boost::system::error_code ec;
-  msg->resize(socket_.available(), 0);
-  socket_.receive(boost::asio::buffer(*msg), 0, ec);
+  msg->assign(receive_buffer_size_, 0);
+  size_t msg_size = socket_.receive(boost::asio::buffer(*msg), 0, ec);
+  msg->resize(msg_size);
 
   if (ec.value() == boost::system::errc::success)
     return ReturnStatuses::OK;
