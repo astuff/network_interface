@@ -35,6 +35,7 @@ public:
   UDPInterface();
 
   // Called to pass in parameters and open ethernet link
+  ReturnStatuses open(std::string ip_address, const int &port, uint receive_buffer_size);
   ReturnStatuses open(std::string ip_address, const int &port);
 
   // Close the ethernet link
@@ -50,6 +51,7 @@ public:
   ReturnStatuses write(const std::vector<uint8_t>& msg);
 
 private:
+  uint receive_buffer_size_ = 1024;
   boost::asio::io_service io_service_;
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
