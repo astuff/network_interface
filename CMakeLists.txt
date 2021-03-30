@@ -41,6 +41,7 @@ add_library(
   ${PROJECT_NAME}
   src/tcp_interface.cpp
   src/udp_interface.cpp
+  src/udp_server.cpp
   src/utils.cpp
 )
 
