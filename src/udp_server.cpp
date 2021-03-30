@@ -92,14 +92,17 @@ void UDPServer::startReceive()
 
 void UDPServer::handleReceive(const boost::system::error_code& error, std::size_t bytes_transferred)
 {
+  // unused
+  (void)bytes_transferred;
+
   if (!error || error == boost::asio::error::message_size)
   {
     std::vector<uint8_t> payload;
     boost::system::error_code ec;
-    unsigned int available = socket_.available();
+    uint32_t available = socket_.available();
     payload.resize(available, 0);
 
-    uint32_t payload_size = socket_.receive_from(boost::asio::buffer(payload, available),
+    socket_.receive_from(boost::asio::buffer(payload, available),
       client_endpoint_, 0, ec);
 
     // User callback
@@ -116,6 +119,11 @@ void UDPServer::handleReceive(const boost::system::error_code& error, std::size_
 void UDPServer::handleSend(std::vector<uint8_t> sent_payload,
   const boost::system::error_code& ec, std::size_t bytes_transferred)
 {
+  // unused
+  (void)sent_payload;
+  (void)ec;
+  (void)bytes_transferred;
+
   startReceive();
 }
 
