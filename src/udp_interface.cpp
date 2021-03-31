@@ -19,13 +19,13 @@ UDPInterface::UDPInterface() :
 {
 }
 
-ReturnStatuses UDPInterface::open(std::string ip_address, const int &port, uint receive_buffer_size)
+ReturnStatuses UDPInterface::open(const std::string& ip_address, uint32_t port, uint32_t receive_buffer_size)
 {
   receive_buffer_size_ = receive_buffer_size;
   return UDPInterface::open(ip_address, port);
 }
 
-ReturnStatuses UDPInterface::open(std::string ip_address, const int &port)
+ReturnStatuses UDPInterface::open(const std::string& ip_address, uint32_t port)
 {
   if (socket_.is_open())
     return ReturnStatuses::OK;
@@ -89,7 +89,7 @@ ReturnStatuses UDPInterface::read(std::vector<uint8_t> *msg)
     return ReturnStatuses::READ_FAILED;
 }
 
-ReturnStatuses UDPInterface::write(const std::vector<uint8_t> &msg)
+ReturnStatuses UDPInterface::write(const std::vector<uint8_t>& msg)
 {
   if (!socket_.is_open())
     return ReturnStatuses::SOCKET_CLOSED;
