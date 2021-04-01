@@ -131,3 +131,8 @@ void UDPServer::run()
 {
   io_service_.run();
 }
+
+void UDPServer::stop()
+{
+  io_service_.stop();
+}

@@ -49,6 +49,9 @@ public:
   // Run the io_service, will block until shutdown
   void run();
 
+  // Stop the io_service, thread safe
+  void stop();
+
 private:
   // Queue an io_service task for receiving on the socket
   void startReceive();
