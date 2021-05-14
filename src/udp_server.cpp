@@ -109,10 +109,17 @@ void UDPServer::handleReceive(const boost::system::error_code& error, std::size_
     std::vector<uint8_t> response = receive_callback_(payload);
 
     // Send response
-    socket_.async_send_to(boost::asio::buffer(response), client_endpoint_,
-      boost::bind(&UDPServer::handleSend, this, response,
-        boost::asio::placeholders::error,
-        boost::asio::placeholders::bytes_transferred));
+    if (response.size() > 0)
+    {
+      socket_.async_send_to(boost::asio::buffer(response), client_endpoint_,
+        boost::bind(&UDPServer::handleSend, this, response,
+          boost::asio::placeholders::error,
+          boost::asio::placeholders::bytes_transferred));
+    }
+    else
+    {
+      startReceive();
+    }
   }
 }
 
