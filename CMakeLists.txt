@@ -32,6 +32,10 @@ catkin_package(
   CATKIN_DEPENDS message_runtime std_msgs
 )
 
+###########
+## Build ##
+###########
+
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
@@ -50,21 +54,30 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+##########
+## TEST ##
+##########
+
+roslint_cpp()
+
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+  catkin_add_gtest(${PROJECT_NAME}_tests test/network_interface_test.cpp)
+  target_link_libraries(${PROJECT_NAME}_tests ${catkin_LIBRARIES})
+endif()
+
+#############
+## Install ##
+#############
+
+## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY include
+## Mark cpp header files for installation
+install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
-
-roslint_cpp()
-
-if(CATKIN_ENABLE_TESTING)
-  roslint_add_test()
-
-  catkin_add_gtest(${PROJECT_NAME}_tests test/network_interface_test.cpp)
-  target_link_libraries(${PROJECT_NAME}_tests ${catkin_LIBRARIES})
-endif()
