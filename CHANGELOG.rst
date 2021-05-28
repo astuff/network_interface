@@ -2,6 +2,15 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.0 (2021-05-21)
+------------------
+* Fix CMakeLists.txt include install (`#40 <https://github.com/astuff/network_interface/issues/40>`_)
+* UDP Server: Don't send reply if zero length (`#38 <https://github.com/astuff/network_interface/issues/38>`_)
+* Add stop function for terminating (`#36 <https://github.com/astuff/network_interface/issues/36>`_)
+* UDP Server Class (`#35 <https://github.com/astuff/network_interface/issues/35>`_)
+* Fix UDP read function, use buffer of fixed size and shrink down after receiving packet (`#33 <https://github.com/astuff/network_interface/issues/33>`_)
+* Contributors: icolwell-as
+
 3.0.0 (2021-03-03)
 ------------------
 * Add noetic CI builds (`#31 <https://github.com/astuff/network_interface/issues/31>`_)
