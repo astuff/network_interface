@@ -1,195 +1,44 @@
-version: 2
+version: 2.1
+
+commands:
+  ros_build:
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            mkdir $CIRCLE_PROJECT_REPONAME
+            mv `find -maxdepth 1 -not -name . -not -name $CIRCLE_PROJECT_REPONAME` $CIRCLE_PROJECT_REPONAME/
+      - run:
+          name: Install Dependencies
+          command: |
+            source /opt/ros/*/setup.bash
+            apt update
+            rosdep update
+            rosdep install --from-paths . --ignore-src -y
+            apt install -y libboost-all-dev
+      - run:
+          name: Build
+          command: |
+            source /opt/ros/*/setup.bash
+            cd ..
+            colcon build
+      - run:
+          name: Run Tests
+          command: |
+            source /opt/ros/*/setup.bash
+            cd ..
+            colcon test --packages-select $CIRCLE_PROJECT_REPONAME
+            colcon test-result --verbose
 jobs:
-  kinetic_x86:
+  foxy:
     docker:
-      - image: autonomoustuff/docker-builds:kinetic-ros-base
+      - image: autonomoustuff/docker-builds:foxy-ros-base
     steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt update -qq
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
-      - run:
-          name: Build
-          command: |
-            cd ..
-            catkin build
-      - run:
-          name: Run Tests
-          command: |
-            source /opt/ros/kinetic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
-    working_directory: ~/src
-
-  kinetic_armhf:
-    machine:
-      image: circleci/classic:latest
-    steps:
-      - checkout
-      - run:
-          name: Install QEMU on Machine
-          command: |
-            sudo apt-get update -qq && sudo apt-get install -y dpkg qemu-user-static
-      - run:
-          name: Clone and Run AS Docker Image
-          command: |
-            docker pull autonomoustuff/docker-builds:kinetic-ros-base
-            docker run -d --name test -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:kinetic-ros-base sh -c "sleep infinity"
-      - run:
-          name: Set Up ROS in Docker
-          command: |
-            docker exec test /bin/bash -c "apt update && source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
-      - run:
-          name: Build in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
-      - run:
-          name: Run Tests in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
-      - run:
-          name: Shut Down Container
-          command: |
-            docker kill $(docker ps -l -q)
-    working_directory: ~/src
-
-  melodic_x86:
-    docker:
-      - image: autonomoustuff/docker-builds:melodic-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-get update -qq
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
-      - run:
-          name: Build
-          command: |
-            cd ..
-            catkin build
-      - run:
-          name: Run Tests
-          command: |
-            source /opt/ros/melodic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
-    working_directory: ~/src
-
-  melodic_armhf:
-    machine:
-      image: circleci/classic:latest
-    steps:
-      - checkout
-      - run:
-          name: Install QEMU on Machine
-          command: |
-            sudo apt-get update -qq && sudo apt-get install -y dpkg qemu-user-static
-      - run:
-          name: Clone and Run AS Docker Image
-          command: |
-            docker pull autonomoustuff/docker-builds:melodic-ros-base
-            docker run -d --name test -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:melodic-ros-base sh -c "sleep infinity"
-      - run:
-          name: Set Up ROS in Docker
-          command: |
-            docker exec test /bin/bash -c "apt update && source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
-      - run:
-          name: Build in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
-      - run:
-          name: Run Tests in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
-      - run:
-          name: Shut Down Container
-          command: |
-            docker kill $(docker ps -l -q)
-    working_directory: ~/src
-
-  noetic_x86:
-    docker:
-      - image: autonomoustuff/docker-builds:noetic-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-get update -qq
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
-      - run:
-          name: Build
-          command: |
-            cd ..
-            catkin build
-      - run:
-          name: Run Tests
-          command: |
-            source /opt/ros/noetic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
-    working_directory: ~/src
-
-  noetic_armhf:
-    machine:
-      image: circleci/classic:latest
-    steps:
-      - checkout
-      - run:
-          name: Install QEMU on Machine
-          command: |
-            sudo apt-get update -qq && sudo apt-get install -y dpkg qemu-user-static
-      - run:
-          name: Clone and Run AS Docker Image
-          command: |
-            docker pull autonomoustuff/docker-builds:noetic-ros-base
-            docker run -d --name test -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:noetic-ros-base sh -c "sleep infinity"
-      - run:
-          name: Set Up ROS in Docker
-          command: |
-            docker exec test /bin/bash -c "apt update && source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
-      - run:
-          name: Build in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
-      - run:
-          name: Run Tests in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
-      - run:
-          name: Shut Down Container
-          command: |
-            docker kill $(docker ps -l -q)
+      - ros_build
     working_directory: ~/src
 
 workflows:
-  version: 2
   ros_build:
     jobs:
-      - kinetic_x86
-      - melodic_x86
-      - noetic_x86
-      - kinetic_armhf
-      - melodic_armhf
-      - noetic_armhf
+      - foxy
