@@ -16,6 +16,7 @@ commands:
             apt update
             rosdep update
             rosdep install --from-paths . --ignore-src -y
+            apt install libboost-all-dev
       - run:
           name: Build
           command: |
