@@ -2,7 +2,7 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.1.1 (2022-06-29)
+2003.1.1 (2022-06-29)
 -----------
 * Ros2 devel (`#42 <https://github.com/astuff/network_interface/issues/42>`_)
   * changes for ros2
