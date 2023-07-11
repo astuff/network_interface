@@ -2,6 +2,14 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2003.1.1 (2022-06-29)
+-----------
+* Ros2 devel (`#42 <https://github.com/astuff/network_interface/issues/42>`_)
+  * changes for ros2
+  * foxy ci
+  * install boost library in docker container
+* Contributors: cullenstoneAS
+
 3.1.0 (2021-05-21)
 ------------------
 * Fix CMakeLists.txt include install (`#40 <https://github.com/astuff/network_interface/issues/40>`_)
