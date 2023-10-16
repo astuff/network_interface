@@ -12,34 +12,32 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 ament_auto_find_build_dependencies()
 
 
 ## Generate messages in the 'msg' folder
-rosidl_generate_interfaces(${PROJECT_NAME}_msgs
+rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TCPFrame.msg"
   "msg/UDPFrame.msg"
   DEPENDENCIES builtin_interfaces std_msgs
 )
 
-
-###########
-## Build ##
-###########
+ament_export_dependencies(rosidl_default_runtime)
 
 include_directories(
   include
 )
 
 add_library(
-  ${PROJECT_NAME}
+  ${PROJECT_NAME}_lib
   src/tcp_interface.cpp
   src/udp_interface.cpp
   src/udp_server.cpp
   src/utils.cpp
 )
 
-ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_targets(${PROJECT_NAME}_lib HAS_LIBRARY_TARGET)
 
 #############
 ## Install ##
@@ -51,8 +49,8 @@ install(
 )
 
 install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}
+  TARGETS ${PROJECT_NAME}_lib
+  EXPORT ${PROJECT_NAME}_lib
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
