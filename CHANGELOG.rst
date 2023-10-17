@@ -2,8 +2,8 @@
 Changelog for package network_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2003.1.2 (2023-10-17)
+---------------------
 * Boost depend testing (`#44 <https://github.com/astuff/network_interface/issues/44>`_)
   * remove installation of boost from circleci config
   * modify CMakeLists so that the messages and library end up where they belong in humble
