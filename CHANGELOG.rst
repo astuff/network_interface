@@ -4,8 +4,8 @@ Changelog for package network_interface
 
 2003.1.2 (2023-10-17)
 ---------------------
-* Boost depend testing (`#44 <https://github.com/astuff/network_interface/issues/44>`_)
-  * remove installation of boost from circleci config
+* Boost dependency testing (`#44 <https://github.com/astuff/network_interface/issues/44>`_)
+  * remove installation of Boost from circleci config
   * modify CMakeLists so that the messages and library end up where they belong in humble
   * reset circleci config to the way it was before
 * Contributors: cullenstoneAS
@@ -15,7 +15,7 @@ Changelog for package network_interface
 * Ros2 devel (`#42 <https://github.com/astuff/network_interface/issues/42>`_)
   * changes for ros2
   * foxy ci
-  * install boost library in docker container
+  * install Boost library in docker container
 * Contributors: cullenstoneAS
 
 3.1.0 (2021-05-21)
